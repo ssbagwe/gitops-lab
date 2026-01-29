@@ -1,0 +1,45 @@
+{
+  "name": "GitOps Lab",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "runArgs": [
+    "--privileged"
+  ],
+  "containerEnv": {
+    "KUBECONFIG": "/home/devuser/.kube/config",
+    "AWS_DEFAULT_REGION": "us-east-1",
+    "AWS_ACCESS_KEY_ID": "test",
+    "AWS_SECRET_ACCESS_KEY": "test",
+    "LOCALSTACK_HOST": "localhost"
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "dockerDashComposeVersion": "v2",
+      "moby": true
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "hashicorp.terraform",
+        "ms-kubernetes-tools.vscode-kubernetes-tools",
+        "redhat.vscode-yaml",
+        "ms-azuretools.vscode-docker",
+        "golang.go",
+        "ms-python.python",
+        "esbenp.prettier-vscode"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "editor.formatOnSave": true,
+        "files.trimTrailingWhitespace": true
+      }
+    }
+  },
+  "postCreateCommand": "/home/devuser/.local/bin/post-create.sh",
+  "postStartCommand": "/home/devuser/.local/bin/post-start.sh",
+  "remoteUser": "devuser",
+  "workspaceFolder": "/workspace"
+}
