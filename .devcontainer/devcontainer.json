@@ -11,7 +11,7 @@
     "--privileged"
   ],
   /* ===============================
-     Environment (no hard-coded creds)
+     Environment
      =============================== */
   "containerEnv": {
     "KUBECONFIG": "/home/devuser/.kube/config",
