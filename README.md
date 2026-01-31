@@ -4,23 +4,34 @@ A self-contained dev container for practicing Kubernetes, ArgoCD, Crossplane, Te
 
 ## Quick Start
 
-1. **Open in VS Code**
+1. **Create the Devcontainer History file on the host**
+
+    ```bash
+    touch ~/.zsh_history_devcontainers
+    ```
+
+2. **Open in VS Code**
+
    ```bash
    code gitops-lab
    ```
+
    Then use Command Palette → "Dev Containers: Reopen in Container"
 
-2. **Start the lab**
+3. **Start the lab**
+
    ```bash
    lab-up
    ```
+
    This creates:
    - 3-node kind cluster (1 control plane, 2 workers)
    - ArgoCD for GitOps
    - LocalStack for AWS services
    - Ingress-nginx controller
 
-3. **Check status**
+4. **Check status**
+
    ```bash
    lab-status
    ```
@@ -41,6 +52,7 @@ A self-contained dev container for practicing Kubernetes, ArgoCD, Crossplane, Te
 | go | 1.23.5 | For operators/tools |
 
 ### Krew Plugins (pre-installed)
+
 | Plugin | Purpose |
 |--------|---------|
 | ctx | Context switching (like kubectx) |
@@ -54,6 +66,7 @@ A self-contained dev container for practicing Kubernetes, ArgoCD, Crossplane, Te
 ## Common Commands
 
 ### Git (via oh-my-zsh git plugin)
+
 ```bash
 gst                    # git status
 ga / gaa               # git add / add all
@@ -65,9 +78,11 @@ glog                   # pretty git log
 grbi HEAD~3            # git rebase -i
 gsta / gstp            # git stash / stash pop
 ```
-Full list: https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/git
+
+Full list: <https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/git>
 
 ### Kubernetes
+
 ```bash
 k9s                    # Terminal UI
 kgp                    # kubectl get pods
@@ -77,6 +92,7 @@ stern <pod>            # Log tailing
 ```
 
 ### Krew Plugins
+
 ```bash
 kubectl ctx            # Switch context (like kubectx)
 kubectl ns             # Switch namespace (like kubens)
@@ -87,6 +103,7 @@ kubectl resource-capacity  # Node resource allocation
 ```
 
 ### ArgoCD
+
 ```bash
 argo-ui                # Port-forward + show creds
 argo-pass              # Get admin password
@@ -95,6 +112,7 @@ argocd app sync <app>  # Sync an app
 ```
 
 ### LocalStack (AWS)
+
 ```bash
 laws s3 ls                           # List S3 buckets
 laws s3 mb s3://my-bucket            # Create bucket
@@ -104,6 +122,7 @@ localstack-status                    # Health check
 ```
 
 ### Terraform
+
 ```bash
 cd terraform/
 tf init                # Initialize
@@ -112,6 +131,7 @@ tf apply               # Apply changes
 ```
 
 ### Lab Management
+
 ```bash
 lab-up                 # Start everything
 lab-down               # Tear down
@@ -132,6 +152,7 @@ lab-status             # Check status
 ```
 
 ### Watch resources
+
 ```bash
 kubectl get managed -w
 ```
@@ -139,6 +160,7 @@ kubectl get managed -w
 ## Practice Scenarios
 
 ### 1. GitOps with ArgoCD
+
 ```bash
 # Deploy sample app via ArgoCD
 kubectl apply -f argocd-apps/sample-app.yaml
@@ -148,6 +170,7 @@ argocd app get sample-app --watch
 ```
 
 ### 2. Terraform + LocalStack
+
 ```bash
 cd terraform/
 cat > s3.tf << 'EOF'
@@ -167,6 +190,7 @@ tf init && tf apply
 ```
 
 ### 3. Helm Chart Development
+
 ```bash
 cd helm-charts/
 helm create my-app
@@ -177,23 +201,28 @@ helm install my-app ./my-app
 ## Troubleshooting
 
 **Docker not starting?**
+
 - Make sure Docker Desktop/OrbStack is running on your Mac
 
 **Kind cluster won't create?**
+
 - Check Docker has enough resources (8GB+ RAM recommended)
 - Try `lab-reset`
 
 **ArgoCD pods not ready?**
+
 - Wait a bit longer, or check: `kubectl get pods -n argocd`
 - Check events: `kubectl get events -n argocd --sort-by='.lastTimestamp'`
 
 **LocalStack not responding?**
+
 - Check logs: `docker logs localstack`
 - Restart: `docker restart localstack`
 
 ## Resource Usage
 
 Approximate memory usage when fully running:
+
 - Kind cluster (3 nodes): ~3-4GB
 - LocalStack: ~1GB
 - Dev container overhead: ~500MB
