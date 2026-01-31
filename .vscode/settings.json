@@ -1,0 +1,151 @@
+{
+   /* ===============================
+     EXISTING SETTINGS (PRESERVED)
+     =============================== */
+   "atlascode.bitbucket.enabled": true,
+   "atlascode.jira.enabled": false,
+   "redhat.telemetry.enabled": true,
+   "cSpell.userWords": [
+      "Istio",
+      "Helm",
+      "Sprig",
+      "GitOps",
+      "ArgoCD",
+      "Kustomize",
+      "FluxCD",
+      "Crossplane",
+      "ProviderConfig",
+      "XRD",
+      "CompositeResource",
+      "Terragrunt",
+      "kubectl",
+      "terraform",
+      "Prometheus",
+      "NodeGroup"
+   ],
+   "git.enableSmartCommit": true,
+   "git.confirmSync": false,
+   "workbench.colorTheme": "Monokai Dimmed",
+   "files.exclude": {
+      "**/.DS_Store": false,
+      "**/.terraform": true,
+      "**/.terragrunt-cache": true,
+      "**/node_modules": true
+   },
+   /* ===============================
+     EDITOR
+     =============================== */
+   "editor.formatOnSave": true,
+   "editor.tabSize": 2,
+   "editor.insertSpaces": true,
+   "editor.rulers": [
+      100
+   ],
+   "editor.wordWrap": "on",
+   "editor.minimap.enabled": false,
+   "editor.renderWhitespace": "boundary",
+   "editor.bracketPairColorization.enabled": true,
+   "editor.guides.bracketPairs": true,
+   "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit"
+   },
+   /* ===============================
+     FILE HYGIENE
+     =============================== */
+   "files.trimTrailingWhitespace": true,
+   "files.insertFinalNewline": true,
+   "files.autoSave": "onFocusChange",
+   /* ===============================
+     YAML / HELM / GO TEMPLATES
+     =============================== */
+   "yaml.format.enable": true,
+   "yaml.validate": true,
+   "yaml.hover": true,
+   "files.associations": {
+      "*.tpl": "gotemplate",
+      "*.gotmpl": "gotemplate",
+      "templates/*.yaml": "helm"
+   },
+   "yaml.schemas": {
+      /* GitHub Actions */
+      "https://json.schemastore.org/github-workflow.json": ".github/workflows/*.yml",
+      /* ArgoCD */
+      "https://raw.githubusercontent.com/argoproj/argo-cd/master/assets/schema.json": "argocd/**/*.yaml",
+      /* =========================
+       Crossplane – Core
+       ========================= */
+      "https://raw.githubusercontent.com/crossplane/crossplane/master/cluster/crds/apiextensions.crossplane.io_compositeresourcedefinitions.yaml": "**/*xrd*.yaml",
+      "https://raw.githubusercontent.com/crossplane/crossplane/master/cluster/crds/apiextensions.crossplane.io_compositions.yaml": "**/*composition*.yaml",
+      "https://raw.githubusercontent.com/crossplane/crossplane/master/cluster/crds/pkg.crossplane.io_providerconfigs.yaml": "**/*providerconfig*.yaml",
+      /* =========================
+       Crossplane – AWS Providers
+       ========================= */
+      /* EC2 / VPC */
+      "https://raw.githubusercontent.com/crossplane/provider-aws/main/package/crds/ec2.aws.crossplane.io_vpcs.yaml": "**/*vpc*.yaml",
+      "https://raw.githubusercontent.com/crossplane/provider-aws/main/package/crds/ec2.aws.crossplane.io_subnets.yaml": "**/*subnet*.yaml",
+      "https://raw.githubusercontent.com/crossplane/provider-aws/main/package/crds/ec2.aws.crossplane.io_securitygroups.yaml": "**/*securitygroup*.yaml",
+      /* EKS */
+      "https://raw.githubusercontent.com/crossplane/provider-aws/main/package/crds/eks.aws.crossplane.io_clusters.yaml": "**/*eks*.yaml",
+      "https://raw.githubusercontent.com/crossplane/provider-aws/main/package/crds/eks.aws.crossplane.io_nodegroups.yaml": "**/*nodegroup*.yaml",
+      /* IAM */
+      "https://raw.githubusercontent.com/crossplane/provider-aws/main/package/crds/iam.aws.crossplane.io_roles.yaml": "**/*iam-role*.yaml",
+      "https://raw.githubusercontent.com/crossplane/provider-aws/main/package/crds/iam.aws.crossplane.io_policies.yaml": "**/*iam-policy*.yaml",
+      /* S3 */
+      "https://raw.githubusercontent.com/crossplane/provider-aws/main/package/crds/s3.aws.crossplane.io_buckets.yaml": "**/*s3*.yaml",
+      /* RDS */
+      "https://raw.githubusercontent.com/crossplane/provider-aws/main/package/crds/rds.aws.crossplane.io_dbinstances.yaml": "**/*rds*.yaml"
+   },
+   /* ===============================
+     HELM
+     =============================== */
+   "helm-ls.enabled": true,
+   "helm-ls.logLevel": "info",
+   "helmIntellisense.enableLinting": true,
+   "helmIntellisense.enableHover": true,
+   /* ===============================
+     KUBERNETES
+     =============================== */
+   "vs-kubernetes.namespace": "default",
+   "vs-kubernetes.outputFormat": "yaml",
+   "vs-kubernetes.kubectl-path": "kubectl",
+   /* ===============================
+     TERRAFORM / AWS
+     =============================== */
+   "[terraform]": {
+      "editor.formatOnSave": true
+   },
+   "[terraform-vars]": {
+      "editor.formatOnSave": true
+   },
+   "terraform.formatOnSave": true,
+   "terraform.languageServer": {
+      "enabled": true
+   },
+   /* ===============================
+     PYTHON (LIGHT, PRACTICAL)
+     =============================== */
+   "python.analysis.typeCheckingMode": "basic",
+   "python.defaultInterpreterPath": "python3",
+   "[python]": {
+      "editor.defaultFormatter": "ms-python.black-formatter",
+      "editor.formatOnSave": true
+   },
+   "python.formatting.provider": "none",
+   "python.linting.enabled": false,
+   /* ===============================
+     TERMINAL (SRE-LIKE)
+     =============================== */
+   "terminal.integrated.fontFamily": "JetBrains Mono",
+   "terminal.integrated.defaultProfile.osx": "zsh",
+   "terminal.integrated.scrollback": 5000,
+   /* ===============================
+     WORKBENCH / NAVIGATION
+     =============================== */
+   "breadcrumbs.enabled": true,
+   "workbench.startupEditor": "none",
+   "workbench.editor.enablePreview": false,
+   "workbench.iconTheme": "vs-seti",
+   "workbench.editor.labelFormat": "short",
+   "explorer.confirmDelete": false,
+   "explorer.confirmDragAndDrop": false
+}

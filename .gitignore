@@ -1,19 +1,65 @@
+# -----------------------------
+# Secrets & sensitive configs
+# -----------------------------
 **/env.conf
 **/secrets.conf
-.*pv-map.tmp
-docker*-registry-auth.json
-**/id_rsa*
-.last-saved-*
-templated-output*.yaml
 plaintext-*.secret
 safe-to-delete*.secret
+*.pem
+*.key
 *id_rsa
 *id_rsa.pub
 *id_ed25519
 *id_ed25519.pub
+
+# -----------------------------
+# Temporary / local files
+# -----------------------------
+.*pv-map.tmp
+.last-saved-*
+templated-output*.yaml
+*.log
+*.tmp.yaml
+*.local.yaml
+
+# -----------------------------
+# OS / editor
+# -----------------------------
 .DS_Store
-.vscode
+#.vscode/
+.idea/
+*.swp
+*.swo
+
+# -----------------------------
+# Docker / container auth
+# -----------------------------
+docker*-registry-auth.json
+
+# -----------------------------
+# Dev directories / local builds
+# -----------------------------
 dev/
+localstack_data/
+*.sqlite
+
+# -----------------------------
+# Helm charts
+# -----------------------------
 **/charts/
 !/charts/README.md
 Chart.lock
+
+# -----------------------------
+# Terraform
+# -----------------------------
+*.tfstate
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+
+# -----------------------------
+# Optional: CI / scratch files
+# -----------------------------
+.build/
+dist/
