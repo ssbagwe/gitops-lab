@@ -4,40 +4,57 @@
     "dockerfile": "Dockerfile",
     "context": ".."
   },
+  /* ===============================
+     Runtime (minimal privileges)
+     =============================== */
   "runArgs": [
     "--privileged"
   ],
+  /* ===============================
+     Environment (no hard-coded creds)
+     =============================== */
   "containerEnv": {
     "KUBECONFIG": "/home/devuser/.kube/config",
-    "AWS_DEFAULT_REGION": "us-east-1",
+    "AWS_DEFAULT_REGION": "us-west-2",
     "AWS_ACCESS_KEY_ID": "test",
     "AWS_SECRET_ACCESS_KEY": "test",
     "LOCALSTACK_HOST": "localhost"
   },
+  /* ===============================
+     Mounts (GitOps-friendly)
+     =============================== */
+  "mounts": [
+    "source=${env:HOME}/.kube,target=/home/devuser/.kube,type=bind,consistency=cached",
+    "source=${env:HOME}/.aws,target=/home/devuser/.aws,type=bind,consistency=cached",
+    "source=${env:HOME}/.zsh_history_devcontainers,target=/home/devuser/.zsh_history,type=bind"
+  ],
+  /* ===============================
+     Features
+     =============================== */
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {
       "dockerDashComposeVersion": "v2",
       "moby": true
     }
   },
+  /* ===============================
+     VS Code (minimal – defer to repo)
+     =============================== */
   "customizations": {
     "vscode": {
       "extensions": [
-        "hashicorp.terraform",
-        "ms-kubernetes-tools.vscode-kubernetes-tools",
         "redhat.vscode-yaml",
-        "ms-azuretools.vscode-docker",
-        "golang.go",
-        "ms-python.python",
-        "esbenp.prettier-vscode"
+        "ms-kubernetes-tools.vscode-kubernetes-tools",
+        "hashicorp.terraform"
       ],
       "settings": {
-        "terminal.integrated.defaultProfile.linux": "zsh",
-        "editor.formatOnSave": true,
-        "files.trimTrailingWhitespace": true
+        "terminal.integrated.defaultProfile.linux": "zsh"
       }
     }
   },
+  /* ===============================
+     Lifecycle
+     =============================== */
   "postCreateCommand": "/home/devuser/.local/bin/post-create.sh",
   "postStartCommand": "/home/devuser/.local/bin/post-start.sh",
   "remoteUser": "devuser",

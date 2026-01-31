@@ -1,5 +1,4 @@
-# S3 bucket with lifecycle policies
-# Practice for the S3 lifecycle questions you've been prepping
+# Practice S3 bucket with lifecycle policies
 
 resource "aws_s3_bucket" "app_data" {
   bucket = "platform-lab-app-data"
