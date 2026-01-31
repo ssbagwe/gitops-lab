@@ -1,0 +1,50 @@
+{
+  "recommendations": [
+    // Git & Collaboration
+    "eamodio.gitlens",
+    "github.vscode-pull-request-github",
+    "github.remotehub",
+    "ms-vscode.remote-repositories",
+    // Jira / Bitbucket
+    "atlassian.atlascode",
+    // Kubernetes / GitOps
+    "ms-kubernetes-tools.vscode-kubernetes-tools",
+    "sandipchitale.vscode-kubernetes-helm-extras",
+    "tim-koehler.helm-intellisense",
+    // Helm / Go Templates / Sprig
+    "romantomjak.go-template",
+    "orimdominic.go-templates-snippets",
+    // YAML / JSON
+    "redhat.vscode-yaml",
+    // Terraform / AWS IaC
+    "hashicorp.terraform",
+    "hashicorp.hcl",
+    // Crossplane (YAML + CRDs driven)
+    "redhat.vscode-yaml",
+    "ms-kubernetes-tools.vscode-kubernetes-tools",
+    // Python (Scripting, Controllers, Tooling)
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "ms-python.debugpy",
+    "ms-python.black-formatter",
+    "ms-python.isort",
+    "ms-python.vscode-python-envs",
+    // Containers / Dev Containers
+    "ms-azuretools.vscode-docker",
+    "ms-azuretools.vscode-containers",
+    "ms-vscode-remote.remote-containers",
+    // Security / Secrets
+    "owenfarrell.vscode-vault",
+    // Ansible (often paired with infra)
+    "redhat.ansible",
+    // Markdown (Docs, ADRs, Runbooks)
+    "yzhang.markdown-all-in-one",
+    "bierner.markdown-preview-github-styles",
+    "davidanson.vscode-markdownlint",
+    // Spell Checking
+    "streetsidesoftware.code-spell-checker",
+    "ban.spellright",
+    // Logs / Ops
+    "emilast.logfilehighlighter"
+  ]
+}
