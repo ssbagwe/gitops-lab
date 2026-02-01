@@ -24,8 +24,8 @@
      Mounts (GitOps-friendly)
      =============================== */
   "mounts": [
-    "source=${env:HOME}/.kube,target=/home/devuser/.kube,type=bind,readonly,consistency=cached",
-    "source=${env:HOME}/.aws,target=/home/devuser/.aws,type=bind,readonly,consistency=cached",
+    "source=${env:HOME}/.kube,target=/home/devuser/.kube,type=bind,consistency=cached",
+    "source=${env:HOME}/.aws,target=/home/devuser/.aws,type=bind,consistency=cached",
     "source=${env:SSH_AUTH_SOCK},target=/ssh-agent,type=bind",
     "source=${env:HOME}/.zsh_history_devcontainers,target=/home/devuser/.zsh_history,type=bind"
   ],
