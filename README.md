@@ -139,18 +139,6 @@ lab-reset              # Full reset
 lab-status             # Check status
 ```
 
-### Directory Structure
-
-```
-/workspace/
-├── k8s-manifests/     # Raw Kubernetes manifests
-├── argocd-apps/       # Sample ArgoCD App
-├── helm-charts/       # Custom Helm charts
-├── terraform/         # Terraform sample
-├── localstack/        # LocalStack-specific configs
-└── scripts/           # Helper scripts
-```
-
 ### Watch resources
 
 ```bash

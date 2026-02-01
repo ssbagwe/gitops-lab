@@ -22,6 +22,11 @@ plugins=(
   fzf
 )
 
+if [ -d "$HOME/.fzf" ]; then
+  source "$HOME/.fzf/shell/key-bindings.zsh"
+  source "$HOME/.fzf/shell/completion.zsh"
+fi
+
 source $ZSH/oh-my-zsh.sh
 
 # Go paths
