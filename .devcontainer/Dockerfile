@@ -32,6 +32,9 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
+# Install pre-commit
+RUN pip3 install --no-cache-dir pre-commit
+
 # Install yq (mikefarah)
 RUN curl -fsSL https://github.com/mikefarah/yq/releases/latest/download/yq_linux_arm64 \
     -o /usr/local/bin/yq && \

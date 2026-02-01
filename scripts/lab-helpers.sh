@@ -60,7 +60,7 @@ lab-up() {
         docker run -d \
             --name localstack \
             --network host \
-            -e SERVICES=s3,dynamodb,sqs,sns,iam,lambda,secretsmanager \
+            -e SERVICES=s3,sqs,sns,iam,lambda,secretsmanager \
             -e DEBUG=0 \
             -v /var/run/docker.sock:/var/run/docker.sock \
             localstack/localstack:latest
