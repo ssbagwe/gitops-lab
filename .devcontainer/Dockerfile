@@ -32,6 +32,9 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
+# Install pre-commit
+RUN pip3 install --no-cache-dir pre-commit
+
 # Install yq (mikefarah)
 RUN curl -fsSL https://github.com/mikefarah/yq/releases/latest/download/yq_linux_arm64 \
     -o /usr/local/bin/yq && \
@@ -101,6 +104,10 @@ ENV GOROOT=/usr/local/go
 ENV GOPATH=/home/$USERNAME/go
 ENV PATH=$PATH:$GOROOT/bin:$GOPATH/bin:/home/$USERNAME/.krew/bin
 
+# Install fzf shell integration (key bindings + completion)
+RUN git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf \
+    && ~/.fzf/install --key-bindings --completion --no-update-rc
+
 # Install oh-my-zsh
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 
@@ -132,9 +139,4 @@ COPY --chown=$USERNAME:$USERNAME scripts/lab-helpers.sh /home/$USERNAME/.local/b
 
 RUN chmod +x /home/$USERNAME/.local/bin/*.sh
 
-# Copy workspace content
-COPY --chown=$USERNAME:$USERNAME terraform /workspace/terraform
-COPY --chown=$USERNAME:$USERNAME k8s-manifests /workspace/k8s-manifests
-COPY --chown=$USERNAME:$USERNAME argocd-apps /workspace/argocd-apps
-
-WORKDIR /workspace
+WORKDIR /workspaces
