@@ -31,16 +31,6 @@ lab-up() {
         kind export kubeconfig --name lab
     fi
 
-    # Install ingress-nginx
-    if ! kubectl get namespace ingress-nginx >/dev/null 2>&1; then
-        echo -e "${YELLOW}📦 Installing ingress-nginx...${NC}"
-        kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
-        kubectl wait --namespace ingress-nginx \
-            --for=condition=ready pod \
-            --selector=app.kubernetes.io/component=controller \
-            --timeout=120s 2>/dev/null || true
-    fi
-
     # Install ArgoCD
     if ! kubectl get namespace argocd >/dev/null 2>&1; then
         echo -e "${YELLOW}📦 Installing ArgoCD...${NC}"

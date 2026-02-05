@@ -1,5 +1,6 @@
 {
   "name": "GitOps Lab",
+  "remoteUser": "ubuntu",
   "build": {
     "dockerfile": "Dockerfile",
     "context": ".."
@@ -14,24 +15,22 @@
      Environment
      =============================== */
   "containerEnv": {
-    "KUBECONFIG": "/home/devuser/.kube/config",
+    "KUBECONFIG": "/home/ubuntu/.kube/config",
     "AWS_DEFAULT_REGION": "us-west-2",
     "AWS_ACCESS_KEY_ID": "test",
     "AWS_SECRET_ACCESS_KEY": "test",
-    "LOCALSTACK_HOST": "localhost"
+    "LOCALSTACK_HOST": "localhost",
+    "SSH_AUTH_SOCK": "/ssh-agent"
   },
   /* ===============================
      Mounts (GitOps-friendly)
      =============================== */
   "mounts": [
-    "source=${env:HOME}/.kube,target=/home/devuser/.kube,type=bind,consistency=cached",
-    "source=${env:HOME}/.aws,target=/home/devuser/.aws,type=bind,consistency=cached",
+    "source=${env:HOME}/.kube,target=/home/ubuntu/.kube,type=bind,consistency=cached",
+    "source=${env:HOME}/.aws,target=/home/ubuntu/.aws,type=bind,consistency=cached",
     "source=${env:SSH_AUTH_SOCK},target=/ssh-agent,type=bind",
-    "source=${env:HOME}/.zsh_history_devcontainers,target=/home/devuser/.zsh_history,type=bind"
+    "source=${env:HOME}/.zsh_history_devcontainers,target=/home/ubuntu/.zsh_history,type=bind"
   ],
-  "containerEnv": {
-    "SSH_AUTH_SOCK": "/ssh-agent"
-  },
   /* ===============================
      Features
      =============================== */
@@ -59,8 +58,7 @@
   /* ===============================
      Lifecycle
      =============================== */
-  "postCreateCommand": "/home/devuser/.local/bin/post-create.sh",
-  "postStartCommand": "/home/devuser/.local/bin/post-start.sh",
-  "remoteUser": "devuser",
+  "postCreateCommand": "/home/ubuntu/.local/bin/post-create.sh",
+  "postStartCommand": "/home/ubuntu/.local/bin/post-start.sh",
   "workspaceFolder": "/workspaces"
 }
