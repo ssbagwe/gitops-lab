@@ -4,7 +4,7 @@ set -e
 echo "🔧 Running post-create setup..."
 
 # Install Python packages for LocalStack and testing
-pip3 install --user --no-build-isolation tomli localstack awscli-local boto3 pytest
+pip3 install --break-system-packages tomli localstack awscli-local
 
 # Set up Terraform plugin cache
 mkdir -p ~/.terraform.d/plugin-cache

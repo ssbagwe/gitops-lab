@@ -19,13 +19,7 @@ plugins=(
   docker
   zsh-autosuggestions
   zsh-syntax-highlighting
-  fzf
 )
-
-if [ -d "$HOME/.fzf" ]; then
-  source "$HOME/.fzf/shell/key-bindings.zsh"
-  source "$HOME/.fzf/shell/completion.zsh"
-fi
 
 source $ZSH/oh-my-zsh.sh
 
@@ -93,8 +87,8 @@ source <(helm completion zsh)
 source <(kind completion zsh)
 source <(argocd completion zsh)
 
-# Nice prompt showing k8s context
-PROMPT='%{$fg[cyan]%}%c%{$reset_color%} $(git_prompt_info)%{$fg[yellow]%}[$(kubectl config current-context 2>/dev/null || echo "no-ctx")]%{$reset_color%} $ '
+# Enable Fuzzy search
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 echo "🚀 GitOps Lab ready!"
 echo "   Run 'lab-status' to check environment"
