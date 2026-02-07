@@ -23,6 +23,10 @@
     "SSH_AUTH_SOCK": "/ssh-agent"
   },
   /* ===============================
+     Initialize Folders on Host
+     =============================== */
+  "initializeCommand": "mkdir -p ~/.kube ~/.aws && touch ~/.zsh_history_devcontainers",
+  /* ===============================
      Mounts (GitOps-friendly)
      =============================== */
   "mounts": [
@@ -31,10 +35,6 @@
     "source=${env:SSH_AUTH_SOCK},target=/ssh-agent,type=bind",
     "source=${env:HOME}/.zsh_history_devcontainers,target=/home/ubuntu/.zsh_history,type=bind"
   ],
-  /* ===============================
-     Initialize Folders on Host
-     =============================== */
-  "initializeCommand": "mkdir -p ~/.kube ~/.aws && touch ~/.zsh_history_devcontainers",
   /* ===============================
      Features
      =============================== */
