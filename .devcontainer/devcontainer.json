@@ -32,13 +32,18 @@
     "source=${env:HOME}/.zsh_history_devcontainers,target=/home/ubuntu/.zsh_history,type=bind"
   ],
   /* ===============================
+     Initialize Folders on Host
+     =============================== */
+  "initializeCommand": "mkdir -p ~/.kube ~/.aws && touch ~/.zsh_history_devcontainers",
+  /* ===============================
      Features
      =============================== */
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {
       "dockerDashComposeVersion": "v2",
       "moby": true
-    }
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {}
   },
   /* ===============================
      VS Code (minimal – defer to repo)

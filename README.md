@@ -4,13 +4,7 @@ A self-contained dev container for practicing Kubernetes, ArgoCD, Crossplane, Te
 
 ## Quick Start
 
-1. **Create the Devcontainer History file on the host**
-
-    ```bash
-    touch ~/.zsh_history_devcontainers
-    ```
-
-2. **Open in VS Code**
+1. **Open in VS Code**
 
    ```bash
    code gitops-lab
@@ -18,7 +12,7 @@ A self-contained dev container for practicing Kubernetes, ArgoCD, Crossplane, Te
 
    Then use Command Palette → "Dev Containers: Reopen in Container"
 
-3. **Start the lab**
+2. **Start the lab**
 
    ```bash
    lab-up
@@ -28,9 +22,8 @@ A self-contained dev container for practicing Kubernetes, ArgoCD, Crossplane, Te
    - 3-node kind cluster (1 control plane, 2 workers)
    - ArgoCD for GitOps
    - LocalStack for AWS services
-   - Ingress-nginx controller
 
-4. **Check status**
+3. **Check status**
 
    ```bash
    lab-status
