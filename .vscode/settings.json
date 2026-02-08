@@ -5,7 +5,6 @@
    "atlascode.bitbucket.enabled": true,
    "atlascode.jira.enabled": false,
    "redhat.telemetry.enabled": true,
-   "dev.containers.forwardSSHAgent": true,
    "cSpell.userWords": [
       "Istio",
       "Helm",

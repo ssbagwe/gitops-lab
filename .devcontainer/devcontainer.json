@@ -9,7 +9,11 @@
      Runtime (minimal privileges)
      =============================== */
   "runArgs": [
-    "--privileged"
+    "--privileged",
+    "-v",
+    "${localEnv:SSH_AUTH_SOCK}:${localEnv:SSH_AUTH_SOCK}",
+    "-e",
+    "SSH_AUTH_SOCK=${localEnv:SSH_AUTH_SOCK}"
   ],
   /* ===============================
      Environment
@@ -20,9 +24,6 @@
     "AWS_ACCESS_KEY_ID": "test",
     "AWS_SECRET_ACCESS_KEY": "test",
     "LOCALSTACK_HOST": "localhost"
-  },
-  "remoteEnv": {
-    "SSH_AUTH_SOCK": "${localEnv:SSH_AUTH_SOCK}"
   },
   /* ===============================
      Initialize Folders on Host
