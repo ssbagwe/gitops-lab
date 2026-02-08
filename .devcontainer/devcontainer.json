@@ -19,8 +19,10 @@
     "AWS_DEFAULT_REGION": "us-west-2",
     "AWS_ACCESS_KEY_ID": "test",
     "AWS_SECRET_ACCESS_KEY": "test",
-    "LOCALSTACK_HOST": "localhost",
-    "SSH_AUTH_SOCK": "/ssh-agent"
+    "LOCALSTACK_HOST": "localhost"
+  },
+  "remoteEnv": {
+    "SSH_AUTH_SOCK": "${localEnv:SSH_AUTH_SOCK}"
   },
   /* ===============================
      Initialize Folders on Host
@@ -32,7 +34,6 @@
   "mounts": [
     "source=${env:HOME}/.kube,target=/home/ubuntu/.kube,type=bind,consistency=cached",
     "source=${env:HOME}/.aws,target=/home/ubuntu/.aws,type=bind,consistency=cached",
-    "source=${env:SSH_AUTH_SOCK},target=/ssh-agent,type=bind",
     "source=${env:HOME}/.zsh_history_devcontainers,target=/home/ubuntu/.zsh_history,type=bind"
   ],
   /* ===============================
