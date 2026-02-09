@@ -112,3 +112,11 @@ LABEL versions.helm="${HELM_VERSION}"
 LABEL versions.kind="${KIND_VERSION}"
 LABEL versions.terraform="${TERRAFORM_VERSION}"
 LABEL versions.argocd="${ARGOCD_VERSION}"
+
+# Healthcheck to verify essential tools are available
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD kubectl version --client && \
+        helm version && \
+        terraform version && \
+        kind version && \
+        argocd version --client || exit 1

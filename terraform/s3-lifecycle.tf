@@ -76,7 +76,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "app_data" {
     }
 
     expiration {
-      days = 2555  # 7 years for compliance
+      days = 2555 # 7 years for compliance
     }
   }
 }
