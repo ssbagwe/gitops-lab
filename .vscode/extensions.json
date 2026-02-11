@@ -45,6 +45,8 @@
     "streetsidesoftware.code-spell-checker",
     "ban.spellright",
     // Logs / Ops
-    "emilast.logfilehighlighter"
+    "emilast.logfilehighlighter",
+    // AI Coding Agents
+    "Codeium.codeium"
   ]
 }

@@ -16,6 +16,7 @@ ARG STERN_VERSION=1.31.0
 
 # Install base dependencies
 RUN apt-get update && apt-get install -y \
+    # checkov:skip=CKV2_DOCKER_1: Acceptable for Dev container
     sudo \
     apt-transport-https \
     ca-certificates \
@@ -112,3 +113,11 @@ LABEL versions.helm="${HELM_VERSION}"
 LABEL versions.kind="${KIND_VERSION}"
 LABEL versions.terraform="${TERRAFORM_VERSION}"
 LABEL versions.argocd="${ARGOCD_VERSION}"
+
+# Healthcheck to verify essential tools are available
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD kubectl version --client && \
+    helm version && \
+    terraform version && \
+    kind version && \
+    argocd version --client || exit 1
