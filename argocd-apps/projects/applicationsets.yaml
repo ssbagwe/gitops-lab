@@ -1,0 +1,23 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: applicationsets
+spec:
+  description: AppProject for all Argo CD Applicationsets
+  sourceRepos:
+    - "*"
+  destinations:
+    - name: "in-cluster"
+      server: https://kubernetes.default.svc
+      namespace: "argocd"
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
+  namespaceResourceBlacklist:
+    - group: ""
+      kind: ResourceQuota
+    - group: ""
+      kind: LimitRange
+    - group: ""
+      kind: NetworkPolicy

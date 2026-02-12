@@ -1,0 +1,19 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: lab-apps
+spec:
+  description: Argo CD project for deploying lab test applications
+  sourceRepos:
+    - "*"
+  destinations:
+    - name: "in-cluster"
+      server: https://kubernetes.default.svc
+      namespace: "*"
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
+  namespaceResourceWhitelist:
+    - group: "*"
+      kind: "*"
