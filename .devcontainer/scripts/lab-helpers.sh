@@ -29,10 +29,6 @@ lab-up() {
         # Wait for nodes to be ready
         echo -e "${YELLOW}⏳ Waiting for nodes...${NC}"
         kubectl wait --for=condition=Ready nodes --all --timeout=120s
-        # Then set ulimits on each node container
-        docker exec -it lab-control-plane sh -c "ulimit -n 1048576"
-        docker exec -it lab-worker sh -c "ulimit -n 1048576"
-        docker exec -it lab-worker2 sh -c "ulimit -n 1048576"
     else
         echo -e "${GREEN}✅ Kind cluster already exists${NC}"
         kind export kubeconfig --name lab
@@ -68,7 +64,7 @@ EOF
         # Add Projects
         kubectl apply -n argocd -f /workspaces/gitops-lab/argocd-apps/projects/
         # Add Repo Link
-        kubectl apply -n argocd -f /workspaces/gitops-lab/argocd-apps/deploy/repo-links.yaml
+        # kubectl apply -n argocd -f /workspaces/gitops-lab/argocd-apps/deploy/repo-links.yaml
     fi
 
     # Start LocalStack

@@ -45,6 +45,12 @@ A self-contained dev container for practicing Kubernetes, ArgoCD, Crossplane, Te
 
    ```bash
    lab-status
+   ```
+
+4. **Deploy the platform & lab applications, port forward ArgoCD UI and generate Admin Login creds**
+
+   ```bash
+   kubectl apply -n argocd -f /workspaces/gitops-lab/argocd-apps/deploy/repo-links.yaml
    argo-ui
    ```
 
@@ -222,6 +228,16 @@ helm install my-app ./my-app
 
 - Check logs: `docker logs localstack`
 - Restart: `docker restart localstack`
+
+**Promtail failing with "Too many open files" error ?**
+
+- **Linux Docker Host**:
+
+   ```bash
+   echo "fs.inotify.max_user_watches=1048576" | sudo tee -a /etc/sysctl.d/99-sysctl.conf
+   echo "fs.inotify.max_user_instances=8192" | sudo tee -a /etc/sysctl.d/99-sysctl.conf
+   sudo sysctl --system
+   ```
 
 ## Resource Usage
 
