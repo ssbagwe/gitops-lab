@@ -56,7 +56,8 @@
         "redhat.vscode-yaml",
         "ms-kubernetes-tools.vscode-kubernetes-tools",
         "hashicorp.terraform",
-        "XargsUK.checkov-prismaless"
+        "XargsUK.checkov-prismaless",
+        "Anthropic.claude-code"
       ],
       "settings": {
         "terminal.integrated.defaultProfile.linux": "zsh"

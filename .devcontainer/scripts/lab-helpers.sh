@@ -57,7 +57,7 @@ lab-up() {
 
         # Wait for LocalStack to be ready
         echo -e "${YELLOW}⏳ Waiting for LocalStack...${NC}"
-        timeout 60 bash -c 'until curl -s http://localhost:4566/_localstack/health | grep -q "running"; do sleep 2; done' 2>/dev/null || true
+        timeout 60 bash -c 'until curl -s http://localhost:4566/_localstack/health | grep -q "available"; do sleep 2; done' 2>/dev/null || true
     fi
 
     echo ""
@@ -129,7 +129,7 @@ lab-status() {
 
     # LocalStack
     if docker ps | grep -q localstack; then
-        if curl -s http://localhost:4566/_localstack/health | grep -q "running" 2>/dev/null; then
+        if curl -s http://localhost:4566/_localstack/health | grep -q "available" 2>/dev/null; then
             echo -e "  LocalStack:  ${GREEN}✅ Running${NC}"
         else
             echo -e "  LocalStack:  ${YELLOW}⚠️  Starting...${NC}"
