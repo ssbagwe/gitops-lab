@@ -45,6 +45,12 @@ A self-contained dev container for practicing Kubernetes, ArgoCD, Crossplane, Te
 
    ```bash
    lab-status
+   ```
+
+4. **Deploy the platform & lab applications, port forward ArgoCD UI and generate Admin Login creds**
+
+   ```bash
+   kubectl apply -n argocd -f /workspaces/gitops-lab/argocd-apps/deploy/repo-links.yaml
    argo-ui
    ```
 
@@ -52,16 +58,17 @@ A self-contained dev container for practicing Kubernetes, ArgoCD, Crossplane, Te
 
 | Tool | Version | Purpose |
 |------|---------|---------|
-| kubectl | 1.34.2 | K8s CLI |
-| helm | 4.0.4 | Package manager |
-| kind | 0.31.0 | Local K8s clusters |
-| k9s | 0.50.18 | Terminal UI |
-| terraform | 1.14.3 | Infrastructure as Code |
-| argocd | 3.2.6 | GitOps CD |
-| kustomize | 5.6.0 | K8s config management |
-| krew | 0.4.4 | kubectl plugin manager |
+| argocd | 3.3.0 | GitOps CD |
 | awscli | v2 | AWS CLI |
 | go | 1.23.5 | For operators/tools |
+| helm | 4.1.0 | Package manager |
+| k9s | 0.50.18 | Terminal UI |
+| kind | 0.31.0 | Local K8s clusters |
+| krew | 0.4.5 | kubectl plugin manager |
+| kubectl | 1.34.4 | K8s CLI |
+| kustomize | 5.6.0 | K8s config management |
+| stern | 1.31.0 | Log tailing |
+| terraform | 1.14.3 | Infrastructure as Code |
 
 ### Krew Plugins (pre-installed)
 
@@ -222,6 +229,16 @@ helm install my-app ./my-app
 
 - Check logs: `docker logs localstack`
 - Restart: `docker restart localstack`
+
+**Promtail failing with "Too many open files" error ?**
+
+- **Linux Docker Host**:
+
+   ```bash
+   echo "fs.inotify.max_user_watches=1048576" | sudo tee -a /etc/sysctl.d/99-sysctl.conf
+   echo "fs.inotify.max_user_instances=8192" | sudo tee -a /etc/sysctl.d/99-sysctl.conf
+   sudo sysctl --system
+   ```
 
 ## Resource Usage
 

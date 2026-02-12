@@ -14,10 +14,7 @@ EOF
 
 # Pre-pull common Helm repos
 helm repo add stable https://charts.helm.sh/stable 2>/dev/null || true
-helm repo add bitnami https://charts.bitnami.com/bitnami 2>/dev/null || true
 helm repo add argo https://argoproj.github.io/argo-helm 2>/dev/null || true
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts 2>/dev/null || true
-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx 2>/dev/null || true
 helm repo update
 
 echo "✅ Post-create setup complete!"

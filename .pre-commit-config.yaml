@@ -18,3 +18,11 @@ repos:
         args: [--fix=lf]
       - id: no-commit-to-branch
       - id: trailing-whitespace
+  - repo: local
+    hooks:
+      - id: sync-versions
+        name: Sync Dockerfile versions to README
+        entry: .devcontainer/scripts/sync-versions.sh
+        language: script
+        files: ^(\.devcontainer/Dockerfile|README\.md)$
+        pass_filenames: false
