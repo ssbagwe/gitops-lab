@@ -58,14 +58,14 @@ A self-contained dev container for practicing Kubernetes, ArgoCD, Crossplane, Te
 
 | Tool | Version | Purpose |
 |------|---------|---------|
-| kubectl | 1.34.2 | K8s CLI |
-| helm | 4.0.4 | Package manager |
+| kubectl | 1.34.4 | K8s CLI |
+| helm | 4.1.0 | Package manager |
 | kind | 0.31.0 | Local K8s clusters |
 | k9s | 0.50.18 | Terminal UI |
 | terraform | 1.14.3 | Infrastructure as Code |
-| argocd | 3.2.6 | GitOps CD |
+| argocd | 3.3.0 | GitOps CD |
 | kustomize | 5.6.0 | K8s config management |
-| krew | 0.4.4 | kubectl plugin manager |
+| krew | 0.4.5 | kubectl plugin manager |
 | awscli | v2 | AWS CLI |
 | go | 1.23.5 | For operators/tools |
 
