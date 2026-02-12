@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# sync-versions.sh - Sync tool versions from Dockerfile to README.md
-# This script extracts version ARGs from the Dockerfile and updates the README.md table
+# sync-versions.sh - Dynamically sync tool versions from Dockerfile to README.md
+# Reads all ARG *_VERSION variables and updates the README table
 
 DOCKERFILE=".devcontainer/Dockerfile"
 README="README.md"
@@ -18,65 +18,113 @@ if [[ ! -f "$README" ]]; then
     exit 1
 fi
 
-# Extract versions from Dockerfile
-KUBECTL_VERSION=$(grep "^ARG KUBECTL_VERSION=" "$DOCKERFILE" | cut -d'=' -f2)
-HELM_VERSION=$(grep "^ARG HELM_VERSION=" "$DOCKERFILE" | cut -d'=' -f2)
-KIND_VERSION=$(grep "^ARG KIND_VERSION=" "$DOCKERFILE" | cut -d'=' -f2)
-K9S_VERSION=$(grep "^ARG K9S_VERSION=" "$DOCKERFILE" | cut -d'=' -f2)
-TERRAFORM_VERSION=$(grep "^ARG TERRAFORM_VERSION=" "$DOCKERFILE" | cut -d'=' -f2)
-ARGOCD_VERSION=$(grep "^ARG ARGOCD_VERSION=" "$DOCKERFILE" | cut -d'=' -f2)
-KUSTOMIZE_VERSION=$(grep "^ARG KUSTOMIZE_VERSION=" "$DOCKERFILE" | cut -d'=' -f2)
-KREW_VERSION=$(grep "^ARG KREW_VERSION=" "$DOCKERFILE" | cut -d'=' -f2)
-GO_VERSION=$(grep "^ARG GO_VERSION=" "$DOCKERFILE" | cut -d'=' -f2)
+# Default descriptions for common tools
+declare -A DESCRIPTIONS=(
+    ["kubectl"]="K8s CLI"
+    ["helm"]="Package manager"
+    ["kind"]="Local K8s clusters"
+    ["k9s"]="Terminal UI"
+    ["terraform"]="Infrastructure as Code"
+    ["argocd"]="GitOps CD"
+    ["kustomize"]="K8s config management"
+    ["krew"]="kubectl plugin manager"
+    ["stern"]="Log tailing"
+    ["go"]="For operators/tools"
+    ["awscli"]="AWS CLI"
+)
 
-# Validate that we got all versions
-if [[ -z "$KUBECTL_VERSION" || -z "$HELM_VERSION" || -z "$KIND_VERSION" || \
-      -z "$K9S_VERSION" || -z "$TERRAFORM_VERSION" || -z "$ARGOCD_VERSION" || \
-      -z "$KUSTOMIZE_VERSION" || -z "$KREW_VERSION" || -z "$GO_VERSION" ]]; then
-    echo "Error: Failed to extract all versions from $DOCKERFILE"
-    exit 1
+# Extract existing descriptions from README to preserve custom ones
+declare -A existing_descriptions
+while IFS='|' read -r _ tool _ version _ description _; do
+    # Trim whitespace
+    tool=$(echo "$tool" | xargs)
+    description=$(echo "$description" | xargs)
+    if [[ -n "$tool" && "$tool" != "Tool" ]]; then
+        existing_descriptions["$tool"]="$description"
+    fi
+done < <(sed -n '/^| Tool | Version | Purpose |$/,/^$/p' "$README" | tail -n +3)
+
+# Extract all *_VERSION ARGs from Dockerfile
+declare -A versions
+while IFS='=' read -r arg value; do
+    # Extract tool name from ARG name (e.g., KUBECTL_VERSION -> kubectl, K9S_VERSION -> k9s)
+    if [[ "$arg" =~ ^ARG\ ([A-Z0-9_]+)_VERSION$ ]]; then
+        tool_upper="${BASH_REMATCH[1]}"
+        tool=$(echo "$tool_upper" | tr '[:upper:]' '[:lower:]')
+        versions["$tool"]="$value"
+    fi
+done < <(grep -E '^ARG [A-Z0-9_]+_VERSION=' "$DOCKERFILE")
+
+# Add awscli if it's installed (it doesn't have a VERSION ARG)
+if grep -q "awscli.amazonaws.com" "$DOCKERFILE"; then
+    versions["awscli"]="v2"
 fi
 
-# Create a temporary file
+# Build the new table
+table_lines=()
+table_lines+=("| Tool | Version | Purpose |")
+table_lines+=("|------|---------|---------|")
+
+# Sort tools alphabetically for consistent output
+readarray -t sorted_tools < <(printf '%s\n' "${!versions[@]}" | sort)
+
+for tool in "${sorted_tools[@]}"; do
+    version="${versions[$tool]}"
+
+    # Use existing description if available, otherwise use default, otherwise generic
+    if [[ -n "${existing_descriptions[$tool]:-}" ]]; then
+        description="${existing_descriptions[$tool]}"
+    elif [[ -n "${DESCRIPTIONS[$tool]:-}" ]]; then
+        description="${DESCRIPTIONS[$tool]}"
+    else
+        description="Tool"
+    fi
+
+    table_lines+=("| $tool | $version | $description |")
+done
+
+# Create temp file
 TMP_FILE=$(mktemp)
 trap 'rm -f "$TMP_FILE"' EXIT
 
-# Update README.md
-# We'll use awk to replace the version table
-awk -v kubectl="$KUBECTL_VERSION" \
-    -v helm="$HELM_VERSION" \
-    -v kind="$KIND_VERSION" \
-    -v k9s="$K9S_VERSION" \
-    -v terraform="$TERRAFORM_VERSION" \
-    -v argocd="$ARGOCD_VERSION" \
-    -v kustomize="$KUSTOMIZE_VERSION" \
-    -v krew="$KREW_VERSION" \
-    -v go="$GO_VERSION" '
-    /^\| kubectl \|/ { print "| kubectl | " kubectl " | K8s CLI |"; next }
-    /^\| helm \|/ { print "| helm | " helm " | Package manager |"; next }
-    /^\| kind \|/ { print "| kind | " kind " | Local K8s clusters |"; next }
-    /^\| k9s \|/ { print "| k9s | " k9s " | Terminal UI |"; next }
-    /^\| terraform \|/ { print "| terraform | " terraform " | Infrastructure as Code |"; next }
-    /^\| argocd \|/ { print "| argocd | " argocd " | GitOps CD |"; next }
-    /^\| kustomize \|/ { print "| kustomize | " kustomize " | K8s config management |"; next }
-    /^\| krew \|/ { print "| krew | " krew " | kubectl plugin manager |"; next }
-    /^\| go \|/ && /For operators\/tools/ { print "| go | " go " | For operators/tools |"; next }
-    { print }
+# Replace the table in README
+awk -v table="$(printf '%s\n' "${table_lines[@]}")" '
+    BEGIN { in_table = 0; table_printed = 0 }
+
+    # Detect start of table
+    /^\| Tool \| Version \| Purpose \|$/ {
+        if (!table_printed) {
+            print table
+            table_printed = 1
+            in_table = 1
+        }
+        next
+    }
+
+    # Skip table header separator
+    /^\|------\|/ && in_table { next }
+
+    # Skip table rows
+    /^\| [^ ]+ \|/ && in_table { next }
+
+    # Detect end of table (empty line or non-table line)
+    in_table && !/^\|/ {
+        in_table = 0
+        print
+        next
+    }
+
+    # Print all other lines
+    !in_table { print }
 ' "$README" > "$TMP_FILE"
 
 # Check if anything changed
 if ! diff -q "$README" "$TMP_FILE" > /dev/null 2>&1; then
     cp "$TMP_FILE" "$README"
     echo "✓ Updated $README with versions from $DOCKERFILE"
-    echo "  kubectl: $KUBECTL_VERSION"
-    echo "  helm: $HELM_VERSION"
-    echo "  kind: $KIND_VERSION"
-    echo "  k9s: $K9S_VERSION"
-    echo "  terraform: $TERRAFORM_VERSION"
-    echo "  argocd: $ARGOCD_VERSION"
-    echo "  kustomize: $KUSTOMIZE_VERSION"
-    echo "  krew: $KREW_VERSION"
-    echo "  go: $GO_VERSION"
+    for tool in "${sorted_tools[@]}"; do
+        echo "  $tool: ${versions[$tool]}"
+    done
     exit 1  # Exit 1 to signal pre-commit that file was modified
 else
     echo "✓ $README versions are already in sync"
