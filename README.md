@@ -242,9 +242,30 @@ helm install my-app ./my-app
 
 ## Resource Usage
 
-Approximate memory usage when fully running:
+Approximate resource usage when fully running:
 
-- Kind cluster (3 nodes): ~3-4GB
-- LocalStack: ~1GB
-- Dev container overhead: ~500MB
-- **Total: ~5-6GB RAM**
+| Component | CPU (cores) | Memory | Notes |
+|-----------|-------------|--------|-------|
+| Kind control-plane | ~380m | ~1.3 GB | API server, etcd, scheduler, controller-manager |
+| Kind worker (x2) | ~470m | ~2.6 GB | Workload nodes (~0.8-1.8 GB each) |
+| Monitoring stack | ~230m | ~1.1 GB | Prometheus, Grafana, Loki, Promtail |
+| ArgoCD | ~53m | ~550 MB | All ArgoCD components |
+| LocalStack | ~50m | ~100 MB | AWS service emulation |
+| Dev container overhead | — | ~500 MB | |
+| **Total** | **~1.2 cores** | **~6 GB RAM** | **4+ CPU cores, 8 GB+ RAM recommended** |
+
+### How to check resource usage
+
+```bash
+# Docker container stats (CPU + memory per container)
+docker stats --no-stream
+
+# Kubernetes node-level usage (requires metrics-server)
+kubectl top nodes
+
+# Kubernetes pod-level usage
+kubectl top pods -A
+
+# Node resource requests/limits summary (krew plugin)
+kubectl resource-capacity
+```
