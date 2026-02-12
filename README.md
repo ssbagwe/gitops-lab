@@ -2,6 +2,23 @@
 
 A self-contained dev container for practicing Kubernetes, ArgoCD, Crossplane, Terraform, and AWS (via LocalStack).
 
+## Table of Contents
+
+- [Quick Start](#quick-start)
+- [Included Tools](#included-tools)
+- [Common Commands](#common-commands)
+  - [Git](#git-via-oh-my-zsh-git-plugin)
+  - [Kubernetes](#kubernetes)
+  - [Krew Plugins](#krew-plugins)
+  - [ArgoCD](#argocd)
+  - [LocalStack (AWS)](#localstack-aws)
+  - [Terraform](#terraform)
+  - [Lab Management](#lab-management)
+  - [Watch Resources](#watch-resources)
+- [Practice Scenarios](#practice-scenarios)
+- [Troubleshooting](#troubleshooting)
+- [Resource Usage](#resource-usage)
+
 ## Quick Start
 
 1. **Open in VS Code**
@@ -10,10 +27,11 @@ A self-contained dev container for practicing Kubernetes, ArgoCD, Crossplane, Te
    code gitops-lab
    ```
 
-   Then use Command Palette → "Dev Containers: Reopen in Container"
+   Then use Command Palette → "Dev Containers: Reopen in Container". This will build the DevContainer Image and start the DevContainer.
 
 2. **Start the lab**
 
+   Open New Terminal in VS Code.
    ```bash
    lab-up
    ```
@@ -27,6 +45,7 @@ A self-contained dev container for practicing Kubernetes, ArgoCD, Crossplane, Te
 
    ```bash
    lab-status
+   argo-ui
    ```
 
 ## Included Tools
@@ -62,9 +81,11 @@ A self-contained dev container for practicing Kubernetes, ArgoCD, Crossplane, Te
 
 ```bash
 gst                    # git status
+gsw branch-name        # git switch
 ga / gaa               # git add / add all
 gcmsg "message"        # git commit -m
 gp / gl                # git push / pull
+gpsup                  # git push --set-upstream origin $(git_current_branch)
 gcb feature-x          # git checkout -b
 gd / gds               # git diff / diff staged
 glog                   # pretty git log
@@ -183,7 +204,9 @@ helm install my-app ./my-app
 
 **Docker not starting?**
 
-- Make sure Docker Desktop/OrbStack is running on your Mac
+- **Linux**: Ensure Docker service is running (`sudo systemctl start docker`) and your user is in the docker group (`sudo usermod -aG docker $USER`, then log out and back in)
+- **Mac**: Make sure Docker Desktop or OrbStack is running
+- **Windows**: Make sure Docker Desktop is running and WSL2 is enabled
 
 **Kind cluster won't create?**
 
