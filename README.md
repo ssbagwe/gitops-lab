@@ -1,4 +1,4 @@
-# GitOps Lab ( Work in Progress... )
+# GitOps Lab
 
 A self-contained dev container for practicing Kubernetes, ArgoCD, Crossplane, Terraform, and AWS (via LocalStack).
 
