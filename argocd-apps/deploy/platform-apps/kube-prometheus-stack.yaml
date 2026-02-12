@@ -1,0 +1,48 @@
+# Kube-Prometheus Stack - Complete monitoring stack with Prometheus, Grafana, and Alertmanager
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kube-prometheus-stack
+  namespace: argocd
+spec:
+  project: platform-apps
+  source:
+    repoURL: https://prometheus-community.github.io/helm-charts
+    targetRevision: 81.6.2
+    chart: kube-prometheus-stack
+    helm:
+      values: |
+        prometheus:
+          prometheusSpec:
+            retention: 7d
+            storageSpec:
+              volumeClaimTemplate:
+                spec:
+                  accessModes: ["ReadWriteOnce"]
+                  resources:
+                    requests:
+                      storage: 10Gi
+        grafana:
+          enabled: true
+          adminPassword: admin
+          defaultDatasourceEnabled: true
+          additionalDataSources:
+            - name: Loki
+              type: loki
+              url: http://loki-gateway.monitoring.svc.cluster.local
+              access: proxy
+              isDefault: false
+              jsonData:
+                maxLines: 1000
+        alertmanager:
+          enabled: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

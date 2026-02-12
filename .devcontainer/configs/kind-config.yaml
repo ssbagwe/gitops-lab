@@ -36,11 +36,23 @@ nodes:
       - containerPort: 30443
         hostPort: 30443
         protocol: TCP
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
   # Worker nodes
   - role: worker
     image: kindest/node:v1.34.3
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
   - role: worker
     image: kindest/node:v1.34.3
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
 networking:
   # Use calico-compatible pod subnet
   podSubnet: "10.244.0.0/16"
