@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/ssbagwe/gitops-lab
     targetRevision: main
-    path: deploy/lab-apps
+    path: argocd-apps/deploy/lab-apps
     directory:
       recurse: true
   destination:
