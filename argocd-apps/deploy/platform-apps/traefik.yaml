@@ -15,6 +15,9 @@ spec:
         # Schedule on worker node with ingress port mappings
         nodeSelector:
           ingress-ready: "true"
+        # Use Kind's port-mapping
+        service:
+          type: NodePort
         # Use hostPort to bind directly to Kind's mapped ports
         ports:
           web:
