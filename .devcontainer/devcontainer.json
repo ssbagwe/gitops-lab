@@ -10,6 +10,8 @@
      =============================== */
   "runArgs": [
     "--privileged",
+    "-p", "80:80",
+    "-p", "443:443",
     "-v",
     "${localEnv:SSH_AUTH_SOCK}:${localEnv:SSH_AUTH_SOCK}",
     "-e",

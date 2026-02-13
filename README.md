@@ -4,6 +4,7 @@ A self-contained dev container for practicing Kubernetes, ArgoCD, Crossplane, Te
 
 ## Table of Contents
 
+- [Prerequisites](#prerequisites)
 - [Quick Start](#quick-start)
 - [Included Tools](#included-tools)
 - [Common Commands](#common-commands)
@@ -18,6 +19,55 @@ A self-contained dev container for practicing Kubernetes, ArgoCD, Crossplane, Te
 - [Practice Scenarios](#practice-scenarios)
 - [Troubleshooting](#troubleshooting)
 - [Resource Usage](#resource-usage)
+
+## Prerequisites
+
+### Install Docker
+
+#### Linux (Ubuntu/Debian)
+
+```bash
+# Update package index
+sudo apt-get update
+
+# Install dependencies
+sudo apt-get install -y ca-certificates curl gnupg
+
+# Add Docker's official GPG key
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+# Add the Docker repository
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# Install Docker Engine
+sudo apt-get update
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# Add your user to the docker group (log out and back in after this)
+sudo usermod -aG docker $USER
+```
+
+#### Mac
+
+Install [Docker Desktop for Mac](https://docs.docker.com/desktop/setup/install/mac-install/) or use Homebrew:
+
+```bash
+brew install --cask docker
+```
+
+Then launch Docker Desktop from Applications and wait for it to start.
+
+### Clone the gitops-lab Repository
+
+```bash
+# Install Microsoft Visual Studio Code & git
+git clone https://github.com/ssbagwe/gitops-lab.git
+```
 
 ## Quick Start
 
@@ -51,8 +101,12 @@ A self-contained dev container for practicing Kubernetes, ArgoCD, Crossplane, Te
 
    ```bash
    kubectl apply -n argocd -f /workspaces/gitops-lab/argocd-apps/deploy/repo-links.yaml
+
    argo-ui
    ```
+
+   <em style="color: green;">Wait for the Applications to deploy and turn green. It will take a while depending on your compute and network.</em>
+
 
 ## Included Tools
 
