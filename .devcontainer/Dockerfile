@@ -36,6 +36,9 @@ RUN apt-get update && apt-get install -y \
     python3-pytest \
     pre-commit \
     net-tools \
+    iputils-ping \
+    telnet \
+    iproute2 \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
