@@ -135,7 +135,7 @@
    /* ===============================
      TERMINAL (SRE-LIKE)
      =============================== */
-   "terminal.integrated.fontFamily": "JetBrains Mono",
+   "terminal.integrated.fontFamily": "monospace",
    "terminal.integrated.defaultProfile.osx": "zsh",
    "terminal.integrated.scrollback": 5000,
    /* ===============================

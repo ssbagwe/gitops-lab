@@ -1,4 +1,4 @@
-# Kube-Prometheus Stack - Complete monitoring stack with Prometheus, Grafana, and Alertmanager
+---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
