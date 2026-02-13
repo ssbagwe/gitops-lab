@@ -1,5 +1,6 @@
 # Sample ArgoCD Application
 # This deploys a simple nginx app using GitOps
+---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:

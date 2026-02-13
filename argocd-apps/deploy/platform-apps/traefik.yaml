@@ -1,0 +1,40 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: traefik
+  namespace: argocd
+spec:
+  project: platform-apps
+  source:
+    repoURL: https://traefik.github.io/charts
+    targetRevision: 39.0.0
+    chart: traefik
+    helm:
+      values: |
+        # Schedule on worker node with ingress port mappings
+        nodeSelector:
+          ingress-ready: "true"
+        # Use hostPort to bind directly to Kind's mapped ports
+        ports:
+          web:
+            hostPort: 80
+          websecure:
+            hostPort: 443
+        # Single replica for local dev
+        deployment:
+          replicas: 1
+        # Enable dashboard for learning/debugging
+        ingressRoute:
+          dashboard:
+            enabled: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: traefik
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

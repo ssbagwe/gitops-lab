@@ -1,4 +1,4 @@
-# Loki - Log aggregation system
+---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:

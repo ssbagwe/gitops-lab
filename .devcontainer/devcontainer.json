@@ -48,6 +48,13 @@
     "ghcr.io/devcontainers/features/github-cli:1": {}
   },
   /* ===============================
+     Port Forwarding (Ingress access)
+     =============================== */
+  "forwardPorts": [
+    80,
+    443
+  ],
+  /* ===============================
      VS Code (minimal – defer to repo)
      =============================== */
   "customizations": {

@@ -8,9 +8,12 @@ nodes:
   # Control plane node
   - role: control-plane
     image: kindest/node:v1.34.3
+  # Worker node 1 (ingress node)
+  - role: worker
+    image: kindest/node:v1.34.3
     kubeadmConfigPatches:
       - |
-        kind: InitConfiguration
+        kind: JoinConfiguration
         nodeRegistration:
           kubeletExtraArgs:
             node-labels: "ingress-ready=true"
@@ -36,9 +39,7 @@ nodes:
       - containerPort: 30443
         hostPort: 30443
         protocol: TCP
-  # Worker nodes
-  - role: worker
-    image: kindest/node:v1.34.3
+  # Worker node 2
   - role: worker
     image: kindest/node:v1.34.3
 networking:
