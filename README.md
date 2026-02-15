@@ -67,6 +67,10 @@ brew install --cask docker
 
 Then launch Docker Desktop from Applications and wait for it to start.
 
+### Install Technitium DNS server for private DNS zone "lab.internal"
+
+[Technitium DNS Server - Installation](https://github.com/TechnitiumSoftware/DnsServer?tab=readme-ov-file#installation)
+
 ### Clone the gitops-lab Repository
 
 ```bash

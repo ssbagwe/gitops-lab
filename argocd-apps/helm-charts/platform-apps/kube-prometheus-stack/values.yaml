@@ -1,6 +1,4 @@
-grafana:
-  host: grafana.lab.internal
-
+---
 kube-prometheus-stack:
   prometheus:
     prometheusSpec:
@@ -26,7 +24,8 @@ kube-prometheus-stack:
           maxLines: 1000
     grafana.ini:
       server:
-        root_url: "%(protocol)s://%(domain)s/grafana"
+        domain: lab.internal
+        root_url: "%(protocol)s://grafana.%(domain)s"
         serve_from_sub_path: true
   alertmanager:
     enabled: true
