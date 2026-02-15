@@ -38,21 +38,6 @@ spec:
             server:
               root_url: "%(protocol)s://%(domain)s/grafana"
               serve_from_sub_path: true
-        extraObjects:
-          - apiVersion: traefik.io/v1alpha1
-            kind: IngressRoute
-            metadata:
-              name: grafana
-              namespace: monitoring
-            spec:
-              entryPoints:
-                - web
-              routes:
-                - match: Host(`grafana.localhost`) || PathPrefix(`/grafana`)
-                  kind: Rule
-                  services:
-                    - name: kube-prometheus-stack-grafana
-                      port: 80
         alertmanager:
           enabled: true
   destination:
