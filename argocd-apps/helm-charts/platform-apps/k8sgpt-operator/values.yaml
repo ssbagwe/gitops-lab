@@ -7,7 +7,7 @@ k8sgpt:
     backend: openai
     secret:
       name: k8sgpt-secret
-      key: openai-api-key
+      key: ai-api-key
     # backOff:
     #   enabled: false
     #   maxRetries: 5

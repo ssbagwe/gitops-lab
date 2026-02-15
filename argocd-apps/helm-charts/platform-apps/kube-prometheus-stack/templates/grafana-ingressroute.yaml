@@ -3,12 +3,11 @@ apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: grafana
-  namespace: monitoring
 spec:
   entryPoints:
     - web
   routes:
-    - match: Host(`grafana.localhost`) || PathPrefix(`/grafana`)
+    - match: Host(`grafana.lab.internal`) || PathPrefix(`/grafana`)
       kind: Rule
       services:
         - name: kube-prometheus-stack-grafana
