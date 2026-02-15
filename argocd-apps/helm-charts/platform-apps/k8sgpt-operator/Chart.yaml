@@ -1,3 +1,4 @@
+---
 apiVersion: v2
 name: k8sgpt-operator
 description: Wrapper chart for k8sgpt-operator

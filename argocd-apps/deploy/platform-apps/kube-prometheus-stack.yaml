@@ -7,39 +7,9 @@ metadata:
 spec:
   project: platform-apps
   source:
-    repoURL: https://prometheus-community.github.io/helm-charts
-    targetRevision: 82.0.0
-    chart: kube-prometheus-stack
-    helm:
-      values: |
-        prometheus:
-          prometheusSpec:
-            retention: 7d
-            storageSpec:
-              volumeClaimTemplate:
-                spec:
-                  accessModes: ["ReadWriteOnce"]
-                  resources:
-                    requests:
-                      storage: 10Gi
-        grafana:
-          enabled: true
-          adminPassword: admin
-          defaultDatasourceEnabled: true
-          additionalDataSources:
-            - name: Loki
-              type: loki
-              url: http://loki-gateway.monitoring.svc.cluster.local
-              access: proxy
-              isDefault: false
-              jsonData:
-                maxLines: 1000
-          grafana.ini:
-            server:
-              root_url: "%(protocol)s://%(domain)s/grafana"
-              serve_from_sub_path: true
-        alertmanager:
-          enabled: true
+    repoURL: https://github.com/ssbagwe/gitops-lab
+    targetRevision: main
+    path: argocd-apps/helm-charts/platform-apps/kube-prometheus-stack
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
