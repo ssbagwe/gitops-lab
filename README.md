@@ -27,6 +27,11 @@ A self-contained dev container for practicing Kubernetes, ArgoCD, Crossplane, Te
 #### Linux (Ubuntu/Debian)
 
 ```bash
+# Configure custom tuning
+echo "fs.inotify.max_user_watches=1048576" | sudo tee -a /etc/sysctl.d/99-sysctl.conf
+echo "fs.inotify.max_user_instances=8192" | sudo tee -a /etc/sysctl.d/99-sysctl.conf
+sudo sysctl --system
+
 # Update package index
 sudo apt-get update
 
@@ -66,7 +71,7 @@ Then launch Docker Desktop from Applications and wait for it to start.
 
 ```bash
 # Install Microsoft Visual Studio Code & git
-git clone https://github.com/ssbagwe/gitops-lab.git
+git clone git@github.com:ssbagwe/gitops-lab.git
 ```
 
 ## Quick Start
