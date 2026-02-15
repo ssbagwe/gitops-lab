@@ -5,6 +5,12 @@ metadata:
   name: k8sgpt-operator
   namespace: argocd
 spec:
+  ignoreDifferences:
+    - group: ""
+      kind: Secret
+      name: k8sgpt-secret
+      jsonPointers:
+        - /data
   project: platform-apps
   source:
     repoURL: https://github.com/ssbagwe/gitops-lab
