@@ -12,7 +12,7 @@ spec:
     path: argocd-apps/helm-charts/platform-apps/k8sgpt-operator
   destination:
     server: https://kubernetes.default.svc
-    namespace: k8sgpt
+    namespace: k8sgpt-operator
   syncPolicy:
     automated:
       prune: true
