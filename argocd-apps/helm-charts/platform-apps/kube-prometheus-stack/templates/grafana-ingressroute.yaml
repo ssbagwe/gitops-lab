@@ -7,7 +7,7 @@ spec:
   entryPoints:
     - web
   routes:
-    - match: Host(`grafana.lab.internal`) || PathPrefix(`/grafana`)
+    - match: Host(`{{ .Values.grafana.host }}`) || PathPrefix(`/grafana`)
       kind: Rule
       services:
         - name: kube-prometheus-stack-grafana
