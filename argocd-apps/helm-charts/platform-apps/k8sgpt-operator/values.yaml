@@ -1,0 +1,51 @@
+k8sgpt:
+  enabled: true
+  name: k8sgpt
+  ai:
+    enabled: true
+    model: gpt-4o-mini
+    backend: openai
+    secret:
+      name: k8sgpt-secret
+      key: openai-api-key
+    # backOff:
+    #   enabled: false
+    #   maxRetries: 5
+    # anonymized: false
+    # language: english
+    # proxyEndpoint: ""
+  noCache: false
+  repository: ghcr.io/k8sgpt-ai/k8sgpt
+  version: v0.4.1
+  # integrations:
+  #   trivy:
+  #     enabled: true
+  #     namespace: trivy-system
+  # filters:
+  #   - Ingress
+  # sink:
+  #   type: slack
+  #   webhook: ""
+  # extraOptions:
+  #   backstage:
+  #     enabled: true
+
+k8sgpt-operator:
+  serviceMonitor:
+    enabled: true
+  grafanaDashboard:
+    enabled: true
+    namespace: monitoring
+    label:
+      key: grafana_dashboard
+      value: "1"
+  controllerManager:
+    replicas: 1
+    manager:
+      resources:
+        requests:
+          cpu: 10m
+          memory: 64Mi
+        limits:
+          cpu: 500m
+          memory: 128Mi

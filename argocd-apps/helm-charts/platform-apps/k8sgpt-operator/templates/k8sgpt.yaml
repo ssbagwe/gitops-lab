@@ -1,0 +1,48 @@
+{{- if .Values.k8sgpt.enabled }}
+---
+apiVersion: core.k8sgpt.ai/v1alpha1
+kind: K8sGPT
+metadata:
+  name: {{ .Values.k8sgpt.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  ai:
+    enabled: {{ .Values.k8sgpt.ai.enabled }}
+    model: {{ .Values.k8sgpt.ai.model }}
+    backend: {{ .Values.k8sgpt.ai.backend }}
+    secret:
+      name: {{ .Values.k8sgpt.ai.secret.name }}
+      key: {{ .Values.k8sgpt.ai.secret.key }}
+    {{- with .Values.k8sgpt.ai.backOff }}
+    backOff:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- if .Values.k8sgpt.ai.anonymized }}
+    anonymized: {{ .Values.k8sgpt.ai.anonymized }}
+    {{- end }}
+    {{- if .Values.k8sgpt.ai.language }}
+    language: {{ .Values.k8sgpt.ai.language }}
+    {{- end }}
+    {{- if .Values.k8sgpt.ai.proxyEndpoint }}
+    proxyEndpoint: {{ .Values.k8sgpt.ai.proxyEndpoint }}
+    {{- end }}
+  noCache: {{ .Values.k8sgpt.noCache }}
+  repository: {{ .Values.k8sgpt.repository }}
+  version: {{ .Values.k8sgpt.version }}
+  {{- with .Values.k8sgpt.integrations }}
+  integrations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.k8sgpt.filters }}
+  filters:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.k8sgpt.sink }}
+  sink:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.k8sgpt.extraOptions }}
+  extraOptions:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}
