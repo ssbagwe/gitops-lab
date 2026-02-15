@@ -1,4 +1,6 @@
-FROM ubuntu:24.04
+FROM ubuntu:24.04@sha256:cd1dba651b3080c3686ecf4e3c4220f026b521fb76978881737d24f200828b2b
+
+ARG TARGETARCH
 
 ARG USERNAME=ubuntu
 
@@ -14,12 +16,14 @@ ARG GO_VERSION=1.23.5
 ARG KREW_VERSION=0.4.5
 ARG STERN_VERSION=1.31.0
 ARG STEP_CLI_VERSION=0.29.0
+ARG YQ_VERSION=4.44.6
+ARG KUBECTX_VERSION=0.9.5
+ARG FZF_VERSION=0.67.0
 
 # Install base dependencies
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     # checkov:skip=CKV2_DOCKER_1: Acceptable for Dev container
     sudo \
-    apt-transport-https \
     ca-certificates \
     curl \
     gnupg \
@@ -38,38 +42,36 @@ RUN apt-get update && apt-get install -y \
     pre-commit \
     net-tools \
     iputils-ping \
-    telnet \
+    ncat \
     iproute2 \
-    && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
 # Add to sudoers
 RUN echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/$USERNAME
 
 # Install Tools in ONE layer with cleanup
-RUN curl -fsSL "https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64" -o /usr/local/bin/yq \
+RUN curl -fsSL "https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_${TARGETARCH}" -o /usr/local/bin/yq \
     && chmod +x /usr/local/bin/yq \
-    && curl -fsSL "https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl" -o /usr/local/bin/kubectl \
+    && curl -fsSL "https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/${TARGETARCH}/kubectl" -o /usr/local/bin/kubectl \
     && chmod +x /usr/local/bin/kubectl \
-    && curl -fsSL "https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz" | tar xz --strip-components=1 -C /usr/local/bin linux-amd64/helm \
-    && curl -fsSL "https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64" -o /usr/local/bin/kind \
+    && curl -fsSL "https://get.helm.sh/helm-v${HELM_VERSION}-linux-${TARGETARCH}.tar.gz" | tar xz --strip-components=1 -C /usr/local/bin linux-${TARGETARCH}/helm \
+    && curl -fsSL "https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-${TARGETARCH}" -o /usr/local/bin/kind \
     && chmod +x /usr/local/bin/kind \
-    && curl -fsSL "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip" -o /tmp/tf.zip \
+    && curl -fsSL "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_${TARGETARCH}.zip" -o /tmp/tf.zip \
     && unzip -q /tmp/tf.zip -d /usr/local/bin && rm /tmp/tf.zip \
-    && curl -fsSL "https://github.com/argoproj/argo-cd/releases/download/v${ARGOCD_VERSION}/argocd-linux-amd64" -o /usr/local/bin/argocd \
+    && curl -fsSL "https://github.com/argoproj/argo-cd/releases/download/v${ARGOCD_VERSION}/argocd-linux-${TARGETARCH}" -o /usr/local/bin/argocd \
     && chmod +x /usr/local/bin/argocd \
-    && curl -fsSL "https://github.com/derailed/k9s/releases/download/v${K9S_VERSION}/k9s_Linux_amd64.tar.gz" | tar xz -C /usr/local/bin k9s \
-    && curl -fsSL "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${KUSTOMIZE_VERSION}/kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz" | tar xz -C /usr/local/bin \
-    && git clone --depth=1 https://github.com/ahmetb/kubectx /opt/kubectx \
+    && curl -fsSL "https://github.com/derailed/k9s/releases/download/v${K9S_VERSION}/k9s_Linux_${TARGETARCH}.tar.gz" | tar xz -C /usr/local/bin k9s \
+    && curl -fsSL "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${KUSTOMIZE_VERSION}/kustomize_v${KUSTOMIZE_VERSION}_linux_${TARGETARCH}.tar.gz" | tar xz -C /usr/local/bin \
+    && git clone --depth=1 --branch v${KUBECTX_VERSION} https://github.com/ahmetb/kubectx /opt/kubectx \
     && ln -s /opt/kubectx/kubectx /usr/local/bin/kubectx \
     && ln -s /opt/kubectx/kubens /usr/local/bin/kubens \
-    && curl -fsSL "https://github.com/stern/stern/releases/download/v${STERN_VERSION}/stern_${STERN_VERSION}_linux_amd64.tar.gz" | tar xz -C /usr/local/bin stern \
-    && curl -fsSL "https://dl.smallstep.com/gh-release/cli/docs-cli-install/v${STEP_CLI_VERSION}/step-cli_${STEP_CLI_VERSION}_amd64.deb" -o /tmp/step-cli.deb \
-    && dpkg -i /tmp/step-cli.deb && rm /tmp/step-cli.deb \
-    && curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o /tmp/aws.zip \
+    && curl -fsSL "https://github.com/stern/stern/releases/download/v${STERN_VERSION}/stern_${STERN_VERSION}_linux_${TARGETARCH}.tar.gz" | tar xz -C /usr/local/bin stern \
+    && curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m).zip" -o /tmp/aws.zip \
     && unzip -q /tmp/aws.zip -d /tmp \
     && /tmp/aws/install \
-    && curl -fsSL "https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz" | tar xz -C /usr/local \
+    && curl -fsSL "https://go.dev/dl/go${GO_VERSION}.linux-${TARGETARCH}.tar.gz" | tar xz -C /usr/local \
+    && curl -fsSL "https://dl.smallstep.com/gh-release/cli/gh-release-header/v${STEP_CLI_VERSION}/step_linux_${STEP_CLI_VERSION}_${TARGETARCH}.tar.gz" | tar xz --strip-components=2 -C /usr/local/bin step_${STEP_CLI_VERSION}/bin/step \
     && rm -rf /tmp/*
 
 # Switch to non-root user for remaining setup
@@ -93,37 +95,25 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master
     && curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/download/v${KREW_VERSION}/${KREW}.tar.gz" \
     && tar zxf "${KREW}.tar.gz" \
     && ./"${KREW}" install krew \
-    && git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf \
-    && ~/.fzf/install --key-bindings --completion --no-update-rc
-
-# Create directories
-RUN mkdir -p /home/$USERNAME/.local/bin \
+    && git clone --depth 1 --branch v${FZF_VERSION} https://github.com/junegunn/fzf.git ~/.fzf \
+    && ~/.fzf/install --key-bindings --completion --no-update-rc \
+    && mkdir -p /home/$USERNAME/.local/bin \
     /home/$USERNAME/.config/k9s
 
 # Copy configuration files
 COPY --chown=$USERNAME:$USERNAME .devcontainer/configs/.zshrc /home/$USERNAME/.zshrc
 COPY --chown=$USERNAME:$USERNAME .devcontainer/configs/kind-config.yaml /home/$USERNAME/.local/kind-config.yaml
-COPY --chown=$USERNAME:$USERNAME .devcontainer/scripts/post-create.sh /home/$USERNAME/.local/bin/post-create.sh
-COPY --chown=$USERNAME:$USERNAME .devcontainer/scripts/post-start.sh /home/$USERNAME/.local/bin/post-start.sh
-COPY --chown=$USERNAME:$USERNAME .devcontainer/scripts/lab-helpers.sh /home/$USERNAME/.local/bin/lab-helpers.sh
-
-RUN chmod +x /home/$USERNAME/.local/bin/*.sh
+COPY --chown=$USERNAME:$USERNAME --chmod=755 .devcontainer/scripts/post-create.sh /home/$USERNAME/.local/bin/post-create.sh
+COPY --chown=$USERNAME:$USERNAME --chmod=755 .devcontainer/scripts/post-start.sh /home/$USERNAME/.local/bin/post-start.sh
+COPY --chown=$USERNAME:$USERNAME --chmod=755 .devcontainer/scripts/lab-helpers.sh /home/$USERNAME/.local/bin/lab-helpers.sh
 
 WORKDIR /workspaces
 
 # Add labels for tracking
-LABEL maintainer="Sameer Bagwe"
-LABEL description="GitOps Lab Devcontainer"
-LABEL versions.kubectl="${KUBECTL_VERSION}"
-LABEL versions.helm="${HELM_VERSION}"
-LABEL versions.kind="${KIND_VERSION}"
-LABEL versions.terraform="${TERRAFORM_VERSION}"
-LABEL versions.argocd="${ARGOCD_VERSION}"
-
-# Healthcheck to verify essential tools are available
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD kubectl version --client && \
-    helm version && \
-    terraform version && \
-    kind version && \
-    argocd version --client || exit 1
+LABEL maintainer="Sameer Bagwe" \
+    description="GitOps Lab Devcontainer" \
+    versions.kubectl="${KUBECTL_VERSION}" \
+    versions.helm="${HELM_VERSION}" \
+    versions.kind="${KIND_VERSION}" \
+    versions.terraform="${TERRAFORM_VERSION}" \
+    versions.argocd="${ARGOCD_VERSION}"
