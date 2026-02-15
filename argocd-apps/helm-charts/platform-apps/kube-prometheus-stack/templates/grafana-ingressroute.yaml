@@ -5,10 +5,12 @@ metadata:
   name: grafana
 spec:
   entryPoints:
-    - web
+    - websecure
   routes:
-    - match: Host(`grafana.{{ index .Values "kube-prometheus-stack" "grafana" "grafana.ini" "server" "domain" }}`) || PathPrefix(`/grafana`)
+    - match: Host(`grafana.{{ index .Values "kube-prometheus-stack" "grafana" "grafana.ini" "server" "domain" }}`)
       kind: Rule
       services:
         - name: kube-prometheus-stack-grafana
           port: 80
+  tls:
+    certResolver: stepca

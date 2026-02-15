@@ -13,6 +13,7 @@ ARG KUSTOMIZE_VERSION=5.6.0
 ARG GO_VERSION=1.23.5
 ARG KREW_VERSION=0.4.5
 ARG STERN_VERSION=1.31.0
+ARG STEP_CLI_VERSION=0.29.0
 
 # Install base dependencies
 RUN apt-get update && apt-get install -y \
@@ -63,6 +64,8 @@ RUN curl -fsSL "https://github.com/mikefarah/yq/releases/latest/download/yq_linu
     && ln -s /opt/kubectx/kubectx /usr/local/bin/kubectx \
     && ln -s /opt/kubectx/kubens /usr/local/bin/kubens \
     && curl -fsSL "https://github.com/stern/stern/releases/download/v${STERN_VERSION}/stern_${STERN_VERSION}_linux_amd64.tar.gz" | tar xz -C /usr/local/bin stern \
+    && curl -fsSL "https://dl.smallstep.com/gh-release/cli/docs-cli-install/v${STEP_CLI_VERSION}/step-cli_${STEP_CLI_VERSION}_amd64.deb" -o /tmp/step-cli.deb \
+    && dpkg -i /tmp/step-cli.deb && rm /tmp/step-cli.deb \
     && curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o /tmp/aws.zip \
     && unzip -q /tmp/aws.zip -d /tmp \
     && /tmp/aws/install \

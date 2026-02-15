@@ -1,0 +1,88 @@
+---
+# Root CA cert for mirroring to other namespaces via Reflector
+rootCA: |
+  -----BEGIN CERTIFICATE-----
+  MIIBuzCCAWGgAwIBAgIQK/FSQxm9kFNcl6yff3Kl8DAKBggqhkjOPQQDAjA8MRgw
+  FgYDVQQKEw9MYWIgSW50ZXJuYWwgQ0ExIDAeBgNVBAMTF0xhYiBJbnRlcm5hbCBD
+  QSBSb290IENBMB4XDTI2MDIxNTIwNDUwNFoXDTM2MDIxMzIwNDUwNFowPDEYMBYG
+  A1UEChMPTGFiIEludGVybmFsIENBMSAwHgYDVQQDExdMYWIgSW50ZXJuYWwgQ0Eg
+  Um9vdCBDQTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABCxiEoExNWBRJvc8qYAT
+  kNYrMcpva6xs/KDmLLgsk75B5sLimVqe4pxNm+sln4otu90JQ7kqiuvPuYeQOBSB
+  zBCjRTBDMA4GA1UdDwEB/wQEAwIBBjASBgNVHRMBAf8ECDAGAQH/AgEBMB0GA1Ud
+  DgQWBBQRMcdVUaFVBg6f5smbBipYVqv8kjAKBggqhkjOPQQDAgNIADBFAiBanlgS
+  p+FSz8sCtsp+9a0I8WGpTZjVxAJcsKXi+I0mnAIhAJZvF4pCRSGFWKE66sB0IGYS
+  v1jthVn3oDrShnwvNZ3V
+  -----END CERTIFICATE-----
+
+step-certificates:
+  inject:
+    enabled: true
+    config:
+      files:
+        ca.json:
+          root: /home/step/certs/root_ca.crt
+          federateRoots: []
+          crt: /home/step/certs/intermediate_ca.crt
+          key: /home/step/secrets/intermediate_ca_key
+          address: :9000
+          dnsNames:
+            - step-certificates.step-ca.svc.cluster.local
+          logger:
+            format: json
+          db:
+            type: badgerv2
+            dataSource: /home/step/db
+          authority:
+            enableAdmin: false
+            provisioners:
+              - {"type":"ACME","name":"acme"}
+          tls:
+            cipherSuites:
+              - TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256
+              - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+            minVersion: 1.2
+            maxVersion: 1.3
+            renegotiation: false
+
+        defaults.json:
+          ca-url: https://step-certificates.step-ca.svc.cluster.local
+          ca-config: /home/step/config/ca.json
+          fingerprint: a31d8b93efbecb8c7b2366ae10916b47e93ce8bdf90e7cd53a48768d86cebf2c
+          root: /home/step/certs/root_ca.crt
+
+    certificates:
+      intermediate_ca: |
+        -----BEGIN CERTIFICATE-----
+        MIIB5DCCAYqgAwIBAgIQfNEX79hOuJoec77tdomFijAKBggqhkjOPQQDAjA8MRgw
+        FgYDVQQKEw9MYWIgSW50ZXJuYWwgQ0ExIDAeBgNVBAMTF0xhYiBJbnRlcm5hbCBD
+        QSBSb290IENBMB4XDTI2MDIxNTIwNDUwNVoXDTM2MDIxMzIwNDUwNVowRDEYMBYG
+        A1UEChMPTGFiIEludGVybmFsIENBMSgwJgYDVQQDEx9MYWIgSW50ZXJuYWwgQ0Eg
+        SW50ZXJtZWRpYXRlIENBMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEZFiXclfj
+        HbZIyqN/BqXRujoJC+EYNVZiAB+dk1xCLo2R/LCtjw4M+L6MoTeBhGTXRhRSDdT/
+        N6pVwXOvMzDoS6NmMGQwDgYDVR0PAQH/BAQDAgEGMBIGA1UdEwEB/wQIMAYBAf8C
+        AQAwHQYDVR0OBBYEFGM+/RsHluOnuCvzFSq/TBno0IKjMB8GA1UdIwQYMBaAFBEx
+        x1VRoVUGDp/myZsGKlhWq/ySMAoGCCqGSM49BAMCA0gAMEUCIFFPYe1yoBGffn1H
+        Np9zaS34tkKC/ZvHdBN27duAQmObAiEAnxUOFMh6mUYe8xxB9YOTE4/OFGZIgsvL
+        00tgWjWN7kg=
+        -----END CERTIFICATE-----
+
+      root_ca: |
+        -----BEGIN CERTIFICATE-----
+        MIIBuzCCAWGgAwIBAgIQK/FSQxm9kFNcl6yff3Kl8DAKBggqhkjOPQQDAjA8MRgw
+        FgYDVQQKEw9MYWIgSW50ZXJuYWwgQ0ExIDAeBgNVBAMTF0xhYiBJbnRlcm5hbCBD
+        QSBSb290IENBMB4XDTI2MDIxNTIwNDUwNFoXDTM2MDIxMzIwNDUwNFowPDEYMBYG
+        A1UEChMPTGFiIEludGVybmFsIENBMSAwHgYDVQQDExdMYWIgSW50ZXJuYWwgQ0Eg
+        Um9vdCBDQTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABCxiEoExNWBRJvc8qYAT
+        kNYrMcpva6xs/KDmLLgsk75B5sLimVqe4pxNm+sln4otu90JQ7kqiuvPuYeQOBSB
+        zBCjRTBDMA4GA1UdDwEB/wQEAwIBBjASBgNVHRMBAf8ECDAGAQH/AgEBMB0GA1Ud
+        DgQWBBQRMcdVUaFVBg6f5smbBipYVqv8kjAKBggqhkjOPQQDAgNIADBFAiBanlgS
+        p+FSz8sCtsp+9a0I8WGpTZjVxAJcsKXi+I0mnAIhAJZvF4pCRSGFWKE66sB0IGYS
+        v1jthVn3oDrShnwvNZ3V
+        -----END CERTIFICATE-----
+
+    # Secrets are created manually — see SETUP.md
+    secrets: {}
+
+  existingSecrets:
+    enabled: true
+    ca: true

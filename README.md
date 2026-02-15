@@ -130,6 +130,7 @@ git clone git@github.com:ssbagwe/gitops-lab.git
 | krew | 0.4.5 | kubectl plugin manager |
 | kubectl | 1.34.4 | K8s CLI |
 | kustomize | 5.6.0 | K8s config management |
+| step_cli | 0.29.0 | Tool |
 | stern | 1.31.0 | Log tailing |
 | terraform | 1.14.3 | Infrastructure as Code |
 
