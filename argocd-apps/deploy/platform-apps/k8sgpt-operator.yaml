@@ -1,0 +1,28 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: k8sgpt-operator
+  namespace: argocd
+spec:
+  ignoreDifferences:
+    - group: ""
+      kind: Secret
+      name: k8sgpt-secret
+      jsonPointers:
+        - /data
+  project: platform-apps
+  source:
+    repoURL: https://github.com/ssbagwe/gitops-lab
+    targetRevision: main
+    path: argocd-apps/helm-charts/platform-apps/k8sgpt-operator
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: k8sgpt-operator
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
