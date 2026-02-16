@@ -21,7 +21,7 @@ ARG KUBECTX_VERSION=0.9.5
 ARG FZF_VERSION=0.67.0
 
 # Install base dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y \
     # checkov:skip=CKV2_DOCKER_1: Acceptable for Dev container
     sudo \
     ca-certificates \
