@@ -38,7 +38,7 @@ spec:
         certificatesResolvers:
           stepca:
             acme:
-              caServer: https://step-certificates.step-ca.svc.cluster.local/acme/acme/directory
+              caServer: https://step-ca-step-certificates.step-ca.svc.cluster.local/acme/acme/directory
               storage: /data/acme.json
               httpChallenge:
                 entryPoint: web
