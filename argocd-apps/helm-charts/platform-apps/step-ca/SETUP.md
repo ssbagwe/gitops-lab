@@ -11,7 +11,7 @@ The `step` CLI is pre-installed in the devcontainer (version pinned in `.devcont
 Generate the initial CA config with keys, certs, and an ACME provisioner:
 
 ```bash
-echo "step-ca-lab-password" > /tmp/step-password.txt
+echo "<step-ca-lab-password>" > /tmp/step-password.txt
 
 step ca init --helm \
   --name "Lab Internal CA" \
@@ -20,20 +20,27 @@ step ca init --helm \
   --provisioner "acme" \
   --acme \
   --password-file /tmp/step-password.txt > /tmp/step-ca-values.yaml
+
+# Remove the default JWK provisioner (only the ACME provisioner is needed)
+yq -i 'del(.inject.config.files."ca.json".authority.provisioners[] | select(.type == "JWK"))' /tmp/step-ca-values.yaml
+
+# Extract the intermediate key before removing secrets
+yq '.inject.secrets.x509.intermediate_ca_key' /tmp/step-ca-values.yaml > /tmp/step-ca-intermediate-key.pem
+
+# Remove secrets (passwords + private keys) and use existingSecrets instead
+yq -i '.inject.secrets = {} | .inject.existingSecrets.enabled = true | .inject.existingSecrets.ca = true' /tmp/step-ca-values.yaml
 ```
 
-This generates:
-- Root CA certificate and encrypted private key
-- Intermediate CA certificate and encrypted private key
+This generates a clean values file with:
+- Root and intermediate CA certificates (public only)
 - ACME provisioner configuration
 - CA fingerprint for client trust
+- `existingSecrets` enabled (private keys and passwords are stored in Kubernetes Secrets)
 
 ## Update values.yaml
 
-1. Copy the generated `config` and `certificates` sections from `/tmp/step-ca-values.yaml` into `values.yaml` under `step-certificates.inject`
-2. Remove the JWK provisioner (keep only the ACME one)
-3. Update the `rootCA` value at the top of `values.yaml` with the generated root CA cert
-4. Do NOT put passwords or private keys in `values.yaml` — these go in Kubernetes Secrets (see below)
+1. Copy the generated `config`, `certificates`, `secrets`, and `existingSecrets` sections from `/tmp/step-ca-values.yaml` into `values.yaml` under `step-certificates.inject`
+2. Do NOT put passwords or private keys in `values.yaml` — these go in Kubernetes Secrets (see below)
 
 ## Create Kubernetes Secrets (before first deploy)
 
@@ -41,13 +48,10 @@ The chart uses `existingSecrets` to reference pre-created Kubernetes Secrets.
 Create them in the `step-ca` namespace before deploying:
 
 ```bash
-# Create namespace
-kubectl create namespace step-ca
-
 # CA password secret
 kubectl create secret generic step-certificates-ca-password \
   -n step-ca \
-  --from-literal=password=step-ca-lab-password
+  --from-literal=password=<step-ca-lab-password>
 
 # Provisioner password secret
 kubectl create secret generic step-certificates-provisioner-password \
@@ -58,13 +62,6 @@ kubectl create secret generic step-certificates-provisioner-password \
 kubectl create secret generic step-certificates-secrets \
   -n step-ca \
   --from-file=intermediate_ca_key=/tmp/step-ca-intermediate-key.pem
-```
-
-To extract the intermediate key from the generated values:
-
-```bash
-# Extract the intermediate_ca_key from the generated values
-yq '.inject.secrets.x509.intermediate_ca_key' /tmp/step-ca-values.yaml > /tmp/step-ca-intermediate-key.pem
 ```
 
 ## ACME Directory URL
