@@ -7,9 +7,18 @@ metadata:
 spec:
   project: platform-apps
   source:
-    repoURL: https://github.com/ssbagwe/gitops-lab
-    targetRevision: main
-    path: argocd-apps/helm-charts/platform-apps/step-ca
+    repoURL: https://smallstep.github.io/helm-charts/
+    targetRevision: 1.29.0
+    chart: step-certificates
+    helm:
+      values: |
+        inject:
+          enabled: false
+        # Add ACME provisioner after bootstrap init
+        ca:
+          bootstrap:
+            postInitHook: |
+              step ca provisioner add acme --type ACME
   destination:
     server: https://kubernetes.default.svc
     namespace: traefik
