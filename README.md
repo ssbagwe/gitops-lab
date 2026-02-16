@@ -5,6 +5,9 @@ A self-contained dev container for practicing Kubernetes, ArgoCD, Crossplane, Te
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
+  - [Install Docker](#install-docker)
+  - [Install Technitium DNS](#install-technitium-dns-server-for-private-dns-zone-labinternal)
+  - [Clone the gitops-lab Repository](#clone-the-gitops-lab-repository)
 - [Quick Start](#quick-start)
 - [Included Tools](#included-tools)
 - [Common Commands](#common-commands)
@@ -69,7 +72,8 @@ Then launch Docker Desktop from Applications and wait for it to start.
 
 ### Install Technitium DNS server for private DNS zone "lab.internal"
 
-[Technitium DNS Server - Installation](https://github.com/TechnitiumSoftware/DnsServer?tab=readme-ov-file#installation)
+- [Technitium DNS Server - Installation](https://github.com/TechnitiumSoftware/DnsServer?tab=readme-ov-file#installation)
+- Create a `lab.internal` DNS zone with `grafana.lab.internal` and `traefik.lab.internal` records pointing to the Docker host's IP address
 
 ### Clone the gitops-lab Repository
 
@@ -107,7 +111,25 @@ git clone git@github.com:ssbagwe/gitops-lab.git
    lab-status
    ```
 
-4. **Deploy the platform & lab applications, port forward ArgoCD UI and generate Admin Login creds**
+4. **Patch CoreDNS to forward `lab.internal` DNS queries to Technitium DNS**
+
+   > Replace `<IP_ADDRESS>` with your Technitium DNS server IP
+
+   ```bash
+   kubectl patch configmap coredns -n kube-system --type merge -p '{
+     "data": {
+       "Corefile": "lab.internal:53 {\n    errors\n    cache 30\n    forward . <IP_ADDRESS>\n}\n.:53 {\n    errors\n    health {\n       lameduck 5s\n    }\n    ready\n    kubernetes cluster.local in-addr.arpa ip6.arpa {\n       pods insecure\n       fallthrough in-addr.arpa ip6.arpa\n       ttl 30\n    }\n    prometheus :9153\n    forward . /etc/resolv.conf {\n       max_concurrent 1000\n    }\n    cache 30 {\n       disable success cluster.local\n       disable denial cluster.local\n    }\n    loop\n    reload\n    loadbalance\n}\n"
+     }
+   }'
+   ```
+
+5. **Restart CoreDNS to apply the configuration changes**
+
+   ```bash
+   kubectl rollout restart deployment coredns -n kube-system
+   ```
+
+6. **Deploy the platform & lab applications, port forward ArgoCD UI and generate Admin Login creds**
 
    ```bash
    kubectl apply -n argocd -f /workspaces/gitops-lab/argocd-apps/deploy/repo-links.yaml
@@ -116,6 +138,35 @@ git clone git@github.com:ssbagwe/gitops-lab.git
    ```
 
    <em style="color: green;">Wait for the Applications to deploy and turn green. It will take a while depending on your compute and network.</em>
+
+7. **Import the Step CA root certificate for browser trust**
+
+   ```bash
+   kubectl get configmap -n traefik step-ca-step-certificates-certs \
+     -o jsonpath='{.data.root_ca\.crt}' > step-root-ca.crt
+   ```
+
+   Then import into your OS trust store:
+   - **macOS**: `sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain step-root-ca.crt`
+   - **Linux**: `sudo cp step-root-ca.crt /usr/local/share/ca-certificates/ && sudo update-ca-certificates`
+   - **Windows**: Double-click the `.crt` > Install Certificate > Local Machine > Trusted Root Certification Authorities
+   - **Firefox**: Settings > Privacy & Security > Certificates > View Certificates > Authorities > Import
+
+8. **Verify the lab services are accessible over HTTPS**
+
+   Open the following URLs in your browser and confirm no certificate warnings:
+   - [https://grafana.lab.internal](https://grafana.lab.internal)
+   - [https://traefik.lab.internal/dashboard/](https://traefik.lab.internal/dashboard/)
+
+   If you encounter certificate errors, restart Step CA and wait for it to be ready, then restart Traefik:
+
+   ```bash
+   kubectl rollout restart statefulset step-ca-step-certificates -n traefik
+   kubectl rollout status statefulset step-ca-step-certificates -n traefik --timeout=60s
+
+   kubectl rollout restart deployment traefik -n traefik
+   kubectl rollout status deployment traefik -n traefik --timeout=60s
+   ```
 
 
 ## Included Tools
