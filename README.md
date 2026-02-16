@@ -135,7 +135,7 @@ git clone git@github.com:ssbagwe/gitops-lab.git
 | step_cli | 0.29.0 | Tool |
 | stern | 1.31.0 | Log tailing |
 | terraform | 1.14.3 | Infrastructure as Code |
-| yq | 4.44.6 | Tool |
+| yq | 4.52.4 | Tool |
 
 ### Krew Plugins (pre-installed)
 
