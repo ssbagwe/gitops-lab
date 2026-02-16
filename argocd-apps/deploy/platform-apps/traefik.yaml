@@ -39,6 +39,7 @@ spec:
           stepca:
             acme:
               caServer: https://step-ca-step-certificates.step-ca.svc.cluster.local/acme/acme/directory
+              caBundle: /step-ca-certs/root_ca.crt
               storage: /data/acme.json
               httpChallenge:
                 entryPoint: web
@@ -52,9 +53,6 @@ spec:
           - name: step-ca-root-ca
             mountPath: /step-ca-certs
             type: configMap
-        env:
-          - name: LEGO_CA_CERTIFICATES
-            value: /step-ca-certs/root_ca.crt
   destination:
     server: https://kubernetes.default.svc
     namespace: traefik
