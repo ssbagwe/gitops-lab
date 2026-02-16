@@ -12,7 +12,7 @@ spec:
     path: argocd-apps/helm-charts/platform-apps/step-ca
   destination:
     server: https://kubernetes.default.svc
-    namespace: step-ca
+    namespace: traefik
   syncPolicy:
     automated:
       prune: true
