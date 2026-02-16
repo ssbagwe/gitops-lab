@@ -69,7 +69,8 @@ Then launch Docker Desktop from Applications and wait for it to start.
 
 ### Install Technitium DNS server for private DNS zone "lab.internal"
 
-[Technitium DNS Server - Installation](https://github.com/TechnitiumSoftware/DnsServer?tab=readme-ov-file#installation)
+- [Technitium DNS Server - Installation](https://github.com/TechnitiumSoftware/DnsServer?tab=readme-ov-file#installation)
+- Create a `lab.internal` DNS zone with `grafana.lab.internal` and `traefik.lab.internal` records pointing to the Docker host's IP address
 
 ### Clone the gitops-lab Repository
 
