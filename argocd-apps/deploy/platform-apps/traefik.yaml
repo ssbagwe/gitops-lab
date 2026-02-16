@@ -31,9 +31,11 @@ spec:
         ingressRoute:
           dashboard:
             enabled: true
+            matchRule: Host(`traefik.lab.internal`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
             entryPoints:
-              - web
               - websecure
+            tls:
+              certResolver: stepca
         # ACME certificate resolver using step-ca as private CA
         certificatesResolvers:
           stepca:
