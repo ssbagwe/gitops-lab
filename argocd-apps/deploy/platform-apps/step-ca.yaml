@@ -16,11 +16,7 @@ spec:
         ca:
           bootstrap:
             postInitHook: |
-              step ca provisioner add acme \
-                --type ACME \
-                --min-tls-cert-duration=24h \
-                --max-tls-cert-duration=2160h \
-                --default-tls-cert-duration=2160h
+              step ca provisioner add acme --type ACME
   destination:
     server: https://kubernetes.default.svc
     namespace: traefik
