@@ -34,6 +34,27 @@ spec:
             entryPoints:
               - web
               - websecure
+        # ACME certificate resolver using step-ca as private CA
+        certificatesResolvers:
+          stepca:
+            acme:
+              caServer: https://step-certificates.step-ca.svc.cluster.local/acme/acme/directory
+              storage: /data/acme.json
+              httpChallenge:
+                entryPoint: web
+        # Persist ACME state across restarts
+        persistence:
+          enabled: true
+          size: 128Mi
+          path: /data
+        # Trust step-ca root CA (mirrored from step-ca namespace via Reflector)
+        volumes:
+          - name: step-ca-root-ca
+            mountPath: /step-ca-certs
+            type: configMap
+        env:
+          - name: LEGO_CA_CERTIFICATES
+            value: /step-ca-certs/root_ca.crt
   destination:
     server: https://kubernetes.default.svc
     namespace: traefik

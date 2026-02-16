@@ -1,0 +1,22 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: step-ca
+  namespace: argocd
+spec:
+  project: platform-apps
+  source:
+    repoURL: https://github.com/ssbagwe/gitops-lab
+    targetRevision: main
+    path: argocd-apps/helm-charts/platform-apps/step-ca
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: step-ca
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

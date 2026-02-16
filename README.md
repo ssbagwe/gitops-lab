@@ -123,15 +123,19 @@ git clone git@github.com:ssbagwe/gitops-lab.git
 |------|---------|---------|
 | argocd | 3.3.0 | GitOps CD |
 | awscli | v2 | AWS CLI |
+| fzf | 0.67.0 | Tool |
 | go | 1.23.5 | For operators/tools |
 | helm | 4.1.0 | Package manager |
 | k9s | 0.50.18 | Terminal UI |
 | kind | 0.31.0 | Local K8s clusters |
 | krew | 0.4.5 | kubectl plugin manager |
 | kubectl | 1.34.4 | K8s CLI |
+| kubectx | 0.9.5 | Tool |
 | kustomize | 5.6.0 | K8s config management |
+| step_cli | 0.29.0 | Tool |
 | stern | 1.31.0 | Log tailing |
 | terraform | 1.14.3 | Infrastructure as Code |
+| yq | 4.44.6 | Tool |
 
 ### Krew Plugins (pre-installed)
 
