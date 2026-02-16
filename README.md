@@ -5,6 +5,9 @@ A self-contained dev container for practicing Kubernetes, ArgoCD, Crossplane, Te
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
+  - [Install Docker](#install-docker)
+  - [Install Technitium DNS](#install-technitium-dns-server-for-private-dns-zone-labinternal)
+  - [Clone the gitops-lab Repository](#clone-the-gitops-lab-repository)
 - [Quick Start](#quick-start)
 - [Included Tools](#included-tools)
 - [Common Commands](#common-commands)
