@@ -5,6 +5,7 @@ metadata:
   name: grafana
 spec:
   entryPoints:
+    - web
     - websecure
   routes:
     - match: Host(`grafana.{{ index .Values "kube-prometheus-stack" "grafana" "grafana.ini" "server" "domain" }}`)
