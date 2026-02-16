@@ -74,7 +74,7 @@ Then launch Docker Desktop from Applications and wait for it to start.
 ### Clone the gitops-lab Repository
 
 ```bash
-# Install Microsoft Visual Studio Code & git
+# Install Microsoft Visual Studio Code, git. Also, setup SSH key in github account.
 git clone git@github.com:ssbagwe/gitops-lab.git
 ```
 
@@ -83,6 +83,7 @@ git clone git@github.com:ssbagwe/gitops-lab.git
 1. **Open in VS Code**
 
    ```bash
+   ssh-add </path/to/your/private_key_github>
    code gitops-lab
    ```
 
