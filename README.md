@@ -187,16 +187,38 @@ git clone git@github.com:ssbagwe/gitops-lab.git
 
 8. **Import the Step CA root certificate for browser trust**
 
+   Export the current root CA from the cluster:
+
    ```bash
    kubectl get configmap -n traefik step-ca-step-certificates-certs \
      -o jsonpath='{.data.root_ca\.crt}' > step-root-ca.crt
    ```
 
-   Then import into your OS trust store:
-   - **macOS**: `sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain step-root-ca.crt`
-   - **Linux**: `sudo cp step-root-ca.crt /usr/local/share/ca-certificates/ && sudo update-ca-certificates`
-   - **Windows**: Double-click the `.crt` > Install Certificate > Local Machine > Trusted Root Certification Authorities
-   - **Firefox**: Settings > Privacy & Security > Certificates > View Certificates > Authorities > Import
+   > **Note:** Each `lab-reset` or devcontainer rebuild generates a new root CA. Remove old ones before importing to avoid stale certificates piling up in your trust store.
+
+   **macOS:**
+   ```bash
+   # Remove old step-ca root CAs
+   sudo security delete-certificate -c "Step Certificates Root CA" /Library/Keychains/System.keychain
+   # Trust the new one
+   sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain step-root-ca.crt
+   ```
+
+   **Linux:**
+   ```bash
+   sudo cp step-root-ca.crt /usr/local/share/ca-certificates/
+   sudo update-ca-certificates
+   ```
+
+   **Windows (PowerShell as Administrator):**
+   ```powershell
+   # Remove old step-ca root CAs
+   Get-ChildItem Cert:\LocalMachine\Root | Where-Object { $_.Subject -like "*Step Certificates*" } | Remove-Item
+   # Trust the new one
+   Import-Certificate -FilePath step-root-ca.crt -CertStoreLocation Cert:\LocalMachine\Root
+   ```
+
+   **Firefox:** Settings > Privacy & Security > Certificates > View Certificates > Authorities > delete old "Step Certificates Root CA" entries, then Import
 
 9. **Verify the lab services are accessible over HTTPS**
 
