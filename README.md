@@ -169,7 +169,13 @@ git clone git@github.com:ssbagwe/gitops-lab.git
    kubectl rollout restart deployment coredns -n kube-system
    ```
 
-6. **Deploy the platform & lab applications, port forward ArgoCD UI and generate Admin Login creds**
+6. **Verify DNS resolution inside the cluster**
+
+   ```bash
+   kubectl run dns-test --rm -it --restart=Never --image=busybox -- nslookup grafana.lab.internal
+   ```
+
+7. **Deploy the platform & lab applications, port forward ArgoCD UI and generate Admin Login creds**
 
    ```bash
    kubectl apply -n argocd -f /workspaces/gitops-lab/argocd-apps/deploy/repo-links.yaml
@@ -179,7 +185,7 @@ git clone git@github.com:ssbagwe/gitops-lab.git
 
    <em style="color: green;">Wait for the Applications to deploy and turn green. It will take a while depending on your compute and network.</em>
 
-7. **Import the Step CA root certificate for browser trust**
+8. **Import the Step CA root certificate for browser trust**
 
    ```bash
    kubectl get configmap -n traefik step-ca-step-certificates-certs \
@@ -192,7 +198,7 @@ git clone git@github.com:ssbagwe/gitops-lab.git
    - **Windows**: Double-click the `.crt` > Install Certificate > Local Machine > Trusted Root Certification Authorities
    - **Firefox**: Settings > Privacy & Security > Certificates > View Certificates > Authorities > Import
 
-8. **Verify the lab services are accessible over HTTPS**
+9. **Verify the lab services are accessible over HTTPS**
 
    Open the following URLs in your browser and confirm no certificate warnings:
    - [https://grafana.lab.internal](https://grafana.lab.internal)
