@@ -6,7 +6,15 @@
     "context": ".."
   },
   /* ===============================
-     Runtime (minimal privileges)
+     System Requirements
+     =============================== */
+  "hostRequirements": {
+    "cpus": 4,
+    "memory": "8gb",
+    "storage": "32gb"
+  },
+  /* ===============================
+     Runtime (privileged for Docker-in-Docker & kind)
      =============================== */
   "runArgs": [
     "--privileged",
@@ -69,7 +77,8 @@
         "Anthropic.claude-code"
       ],
       "settings": {
-        "terminal.integrated.defaultProfile.linux": "zsh"
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "workbench.startupEditor": "readme"
       }
     }
   },
@@ -78,5 +87,6 @@
      =============================== */
   "postCreateCommand": "/home/ubuntu/.local/bin/post-create.sh",
   "postStartCommand": "/home/ubuntu/.local/bin/post-start.sh",
+  "shutdownAction": "stopContainer",
   "workspaceFolder": "/workspaces"
 }
