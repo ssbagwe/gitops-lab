@@ -7,6 +7,7 @@ A self-contained dev container for practicing Kubernetes, ArgoCD, Crossplane, Te
 - [Prerequisites](#prerequisites)
   - [Install Docker](#install-docker)
   - [Install Technitium DNS](#install-technitium-dns-server-for-private-dns-zone-labinternal)
+  - [Configure DNS Forwarding](#configure-dns-forwarding-to-technitium-for-labinternal)
   - [Clone the gitops-lab Repository](#clone-the-gitops-lab-repository)
 - [Quick Start](#quick-start)
 - [Included Tools](#included-tools)
@@ -74,6 +75,45 @@ Then launch Docker Desktop from Applications and wait for it to start.
 
 - [Technitium DNS Server - Installation](https://github.com/TechnitiumSoftware/DnsServer?tab=readme-ov-file#installation)
 - Create a `lab.internal` DNS zone with `grafana.lab.internal` and `traefik.lab.internal` records pointing to the Docker host's IP address
+
+### Configure DNS forwarding to Technitium for `lab.internal`
+
+Configure your local DNS resolver to forward `lab.internal` queries to the Technitium DNS server:
+
+#### macOS
+
+```bash
+sudo mkdir -p /etc/resolver
+echo "nameserver <TECHNITIUM_IP>" | sudo tee /etc/resolver/lab.internal
+```
+
+Verify with: `scutil --dns | grep lab.internal -A 5`
+
+#### Linux (systemd-resolved)
+
+```bash
+sudo mkdir -p /etc/systemd/resolved.conf.d
+cat <<EOF | sudo tee /etc/systemd/resolved.conf.d/lab-internal.conf
+[Resolve]
+DNS=<TECHNITIUM_IP>
+Domains=~lab.internal
+EOF
+sudo systemctl restart systemd-resolved
+```
+
+Verify with: `resolvectl query grafana.lab.internal`
+
+#### Windows
+
+Use PowerShell (as Administrator):
+
+```powershell
+Add-DnsClientNrptRule -Namespace ".lab.internal" -NameServers "<TECHNITIUM_IP>"
+```
+
+Verify with: `Resolve-DnsName grafana.lab.internal`
+
+> Replace `<TECHNITIUM_IP>` with the IP address of your Technitium DNS server.
 
 ### Clone the gitops-lab Repository
 
