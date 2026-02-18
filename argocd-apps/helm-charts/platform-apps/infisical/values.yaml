@@ -4,6 +4,7 @@ infisical:
 
 infisical-standalone:
   infisical:
+    fullnameOverride: infisical
     replicaCount: 1
   ingress:
     enabled: false
