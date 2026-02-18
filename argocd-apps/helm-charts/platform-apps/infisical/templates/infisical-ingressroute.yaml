@@ -13,7 +13,7 @@ spec:
       middlewares:
         - name: redirect-to-https
       services:
-        - name: infisical-standalone
+        - name: {{ .Release.Name }}-infisical-standalone
           port: 8080
 ---
 apiVersion: traefik.io/v1alpha1
@@ -37,7 +37,7 @@ spec:
     - match: Host(`infisical.{{ .Values.infisical.domain }}`)
       kind: Rule
       services:
-        - name: infisical-standalone
+        - name: {{ .Release.Name }}-infisical-standalone
           port: 8080
   tls:
     certResolver: stepca
