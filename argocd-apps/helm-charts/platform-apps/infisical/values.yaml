@@ -4,10 +4,6 @@ infisical:
 
 infisical-standalone:
   infisical:
-    image:
-      repository: infisical/infisical
-      tag: "v0.151.0"
-      pullPolicy: IfNotPresent
     replicaCount: 1
   ingress:
     enabled: false
