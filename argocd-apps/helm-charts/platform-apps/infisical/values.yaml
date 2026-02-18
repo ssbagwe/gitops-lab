@@ -1,0 +1,15 @@
+---
+infisical:
+  domain: lab.internal
+
+infisical-standalone:
+  infisical:
+    replicaCount: 1
+  ingress:
+    enabled: false
+    nginx:
+      enabled: false
+  postgresql:
+    enabled: true
+  redis:
+    enabled: true
