@@ -1,0 +1,10 @@
+---
+apiVersion: v2
+name: infisical
+description: Wrapper chart for Infisical self-hosted secret management
+version: 0.1.0
+type: application
+dependencies:
+  - name: infisical-standalone
+    version: 1.7.2
+    repository: https://dl.cloudsmith.io/public/infisical/helm-charts/helm/charts/
