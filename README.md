@@ -326,6 +326,7 @@ laws s3 ls                           # List S3 buckets
 laws s3 mb s3://my-bucket            # Create bucket
 laws dynamodb list-tables            # List DynamoDB tables
 test-s3                              # Quick S3 smoke test
+localstack-start                     # Start/restart stopped container
 localstack-status                    # Health check
 ```
 
