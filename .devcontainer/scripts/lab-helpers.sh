@@ -180,6 +180,32 @@ argo-pass() {
 }
 
 # LocalStack helpers
+localstack-start() {
+    if docker ps | grep -q localstack; then
+        echo -e "${GREEN}✅ LocalStack already running${NC}"
+        return 0
+    fi
+
+    # Container exists but stopped — restart it
+    if docker ps -a | grep -q localstack; then
+        echo -e "${YELLOW}📦 Restarting LocalStack...${NC}"
+        docker start localstack
+    else
+        echo -e "${YELLOW}📦 Starting LocalStack...${NC}"
+        docker run -d \
+            --name localstack \
+            --network host \
+            -e SERVICES=s3,sqs,sns,iam,lambda,secretsmanager \
+            -e DEBUG=0 \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            localstack/localstack:${LOCALSTACK_VERSION}
+    fi
+
+    echo -e "${YELLOW}⏳ Waiting for LocalStack...${NC}"
+    timeout 60 bash -c 'until curl -s http://localhost:4566/_localstack/health | grep -q "available"; do sleep 2; done' 2>/dev/null || true
+    echo -e "${GREEN}✅ LocalStack ready${NC}"
+}
+
 localstack-status() {
     curl -s http://localhost:4566/_localstack/health | jq .
 }
