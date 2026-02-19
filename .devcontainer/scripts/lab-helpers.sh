@@ -11,6 +11,48 @@ NC='\033[0m' # No Color
 # Pin LocalStack version
 LOCALSTACK_VERSION=4.13.1
 
+# Patch CoreDNS for lab.internal DNS forwarding
+patch-coredns() {
+    if ! kubectl get configmap coredns -n kube-system -o jsonpath='{.data.Corefile}' 2>/dev/null | grep -q "lab.internal"; then
+        echo -e "${YELLOW}🔧 Configuring CoreDNS for lab.internal DNS forwarding...${NC}"
+        while true; do
+            printf "  Enter Technitium DNS server IP (empty to skip): " && read -r TECHNITIUM_IP
+            if [[ -z "$TECHNITIUM_IP" ]]; then
+                echo -e "${YELLOW}⚠️  Skipped CoreDNS patching (no IP provided)${NC}"
+                return 0
+            elif ! [[ "$TECHNITIUM_IP" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+                echo -e "${RED}❌ Invalid IP address: ${TECHNITIUM_IP}${NC}"
+                continue
+            else
+                break
+            fi
+        done
+
+        if [[ -n "$TECHNITIUM_IP" ]]; then
+            kubectl patch configmap coredns -n kube-system --type merge -p "{
+              \"data\": {
+                \"Corefile\": \"lab.internal:53 {\\n    errors\\n    cache 30\\n    forward . ${TECHNITIUM_IP}\\n}\\n.:53 {\\n    errors\\n    health {\\n       lameduck 5s\\n    }\\n    ready\\n    kubernetes cluster.local in-addr.arpa ip6.arpa {\\n       pods insecure\\n       fallthrough in-addr.arpa ip6.arpa\\n       ttl 30\\n    }\\n    prometheus :9153\\n    forward . /etc/resolv.conf {\\n       max_concurrent 1000\\n    }\\n    cache 30 {\\n       disable success cluster.local\\n       disable denial cluster.local\\n    }\\n    loop\\n    reload\\n    loadbalance\\n}\\n\"
+              }
+            }"
+
+            # Restart CoreDNS to apply changes
+            echo -e "${YELLOW}♻️  Restarting CoreDNS...${NC}"
+            kubectl rollout restart deployment coredns -n kube-system
+            kubectl rollout status deployment coredns -n kube-system --timeout=60s
+
+            # Verify DNS resolution
+            echo -e "${YELLOW}🔍 Verifying DNS resolution inside the cluster...${NC}"
+            if kubectl run dns-test --rm -i --restart=Never --image=busybox -- nslookup grafana.lab.internal 2>/dev/null; then
+                echo -e "${GREEN}✅ DNS resolution verified${NC}"
+            else
+                echo -e "${YELLOW}⚠️  DNS verification failed (Technitium may not be reachable from the cluster)${NC}"
+            fi
+        fi
+    else
+        echo -e "${GREEN}✅ CoreDNS already configured for lab.internal${NC}"
+    fi
+}
+
 # Create the full lab environment
 lab-up() {
     echo -e "${BLUE}🚀 Starting GitOps Lab...${NC}"
@@ -63,28 +105,22 @@ stringData:
 EOF
         # Add Projects
         kubectl apply -n argocd -f /workspaces/gitops-lab/argocd-apps/projects/
-        # Add Repo Link
-        # kubectl apply -n argocd -f /workspaces/gitops-lab/argocd-apps/deploy/repo-links.yaml
     fi
+
+    # Patch CoreDNS for lab.internal DNS forwarding
+    patch-coredns
+
+    # Deploy platform & lab ArgoCD applications
+    echo -e "${YELLOW}📦 Deploying platform & lab applications...${NC}"
+    kubectl apply -n argocd -f /workspaces/gitops-lab/argocd-apps/deploy/repo-links.yaml
+    echo -e "${GREEN}✅ ArgoCD applications deployed${NC}"
 
     # Start LocalStack
-    if ! docker ps | grep -q localstack; then
-        echo -e "${YELLOW}📦 Starting LocalStack...${NC}"
-        docker run -d \
-            --name localstack \
-            --network host \
-            -e SERVICES=s3,sqs,sns,iam,lambda,secretsmanager \
-            -e DEBUG=0 \
-            -v /var/run/docker.sock:/var/run/docker.sock \
-            localstack/localstack:${LOCALSTACK_VERSION}
-
-        # Wait for LocalStack to be ready
-        echo -e "${YELLOW}⏳ Waiting for LocalStack...${NC}"
-        timeout 60 bash -c 'until curl -s http://localhost:4566/_localstack/health | grep -q "available"; do sleep 2; done' 2>/dev/null || true
-    fi
+    localstack-start
 
     echo ""
     echo -e "${GREEN}✅ Lab is ready!${NC}"
+    echo -e "${YELLOW}💡 Run 'argo-ui' to port-forward ArgoCD UI and get admin credentials${NC}"
     lab-status
 }
 
@@ -163,6 +199,99 @@ lab-status() {
 
     echo ""
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+}
+
+# Bootstrap platform secrets interactively
+lab-secrets() {
+    echo ""
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${BLUE}  Bootstrap Platform Secrets${NC}"
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+
+    # 1. Infisical secrets (infisical namespace)
+    echo -e "${YELLOW}[1/3] Infisical Application Secrets${NC}"
+    echo -e "  Namespace: infisical | Secret: infisical-secrets"
+    echo ""
+
+    printf "  AUTH_SECRET (leave empty to auto-generate): " && read -r INFISICAL_AUTH_SECRET
+    if [[ -z "$INFISICAL_AUTH_SECRET" ]]; then
+        INFISICAL_AUTH_SECRET=$(openssl rand -base64 32)
+        echo -e "  ${GREEN}Auto-generated AUTH_SECRET${NC}"
+    fi
+
+    printf "  ENCRYPTION_KEY (leave empty to auto-generate): " && read -r INFISICAL_ENCRYPTION_KEY
+    if [[ -z "$INFISICAL_ENCRYPTION_KEY" ]]; then
+        INFISICAL_ENCRYPTION_KEY=$(openssl rand -hex 16)
+        echo -e "  ${GREEN}Auto-generated ENCRYPTION_KEY${NC}"
+    fi
+
+    printf "  SITE_URL [https://infisical.lab.internal]: " && read -r INFISICAL_SITE_URL
+    INFISICAL_SITE_URL=${INFISICAL_SITE_URL:-https://infisical.lab.internal}
+
+    kubectl create secret generic infisical-secrets -n infisical \
+        --from-literal=AUTH_SECRET="$INFISICAL_AUTH_SECRET" \
+        --from-literal=ENCRYPTION_KEY="$INFISICAL_ENCRYPTION_KEY" \
+        --from-literal=SITE_URL="$INFISICAL_SITE_URL" \
+        --dry-run=client -o yaml | kubectl apply -f -
+    echo -e "  ${GREEN}✅ infisical-secrets configured${NC}"
+
+    # Restart Infisical pods to pick up new secrets
+    kubectl rollout restart deployment -n infisical 2>/dev/null || true
+    echo -e "  ${GREEN}♻️  Restarted infisical pods${NC}"
+    echo ""
+
+    # 2. ESO Infisical credentials (external-secrets namespace)
+    echo -e "${YELLOW}[2/3] External Secrets - Infisical Credentials${NC}"
+    echo -e "  Namespace: external-secrets | Secret: external-secrets-infisical-credentials"
+    echo -e "  ${RED}(First, create a Project \"gitops-lab\" and associate it with Machine Identity with Universal Auth)${NC}"
+    echo -e "  ${BLUE}- https://infisical.lab.internal/organization/projects${NC}"
+    echo -e "  ${BLUE}- https://infisical.lab.internal/organization/access-management?selectedTab=identities${NC}"
+    echo ""
+
+    printf "  Infisical Client ID: " && read -r ESO_INFISICAL_CLIENT_ID
+    printf "  Infisical Client Secret: " && read -rs ESO_INFISICAL_CLIENT_SECRET
+    echo ""
+
+    if [[ -n "$ESO_INFISICAL_CLIENT_ID" && -n "$ESO_INFISICAL_CLIENT_SECRET" ]]; then
+        kubectl create secret generic external-secrets-infisical-credentials -n external-secrets \
+            --from-literal=clientId="$ESO_INFISICAL_CLIENT_ID" \
+            --from-literal=clientSecret="$ESO_INFISICAL_CLIENT_SECRET" \
+            --dry-run=client -o yaml | kubectl apply -f -
+        echo -e "  ${GREEN}✅ external-secrets-infisical-credentials configured${NC}"
+
+        # Restart ESO pods to pick up new credentials
+        kubectl rollout restart deployment -n external-secrets 2>/dev/null || true
+        echo -e "  ${GREEN}♻️  Restarted external-secrets pods${NC}"
+    else
+        echo -e "  ${YELLOW}⚠️  Skipped (empty input)${NC}"
+    fi
+    echo ""
+
+    # 3. K8sGPT OpenAI secret (k8sgpt-operator namespace)
+    echo -e "${YELLOW}[3/3] K8sGPT - OpenAI API Key${NC}"
+    echo -e "  Namespace: k8sgpt-operator | Secret: k8sgpt-secret"
+    echo ""
+
+    printf "  OpenAI API Key (leave empty to skip): " && read -rs K8SGPT_API_KEY
+    echo ""
+
+    if [[ -n "$K8SGPT_API_KEY" ]]; then
+        kubectl create secret generic k8sgpt-secret -n k8sgpt-operator \
+            --from-literal=ai-api-key="$K8SGPT_API_KEY" \
+            --dry-run=client -o yaml | kubectl apply -f -
+        echo -e "  ${GREEN}✅ k8sgpt-secret configured${NC}"
+
+        # Restart K8sGPT pods to pick up new API key
+        kubectl rollout restart deployment -n k8sgpt-operator 2>/dev/null || true
+        echo -e "  ${GREEN}♻️  Restarted k8sgpt-operator pods${NC}"
+    else
+        echo -e "  ${YELLOW}⚠️  Skipped (empty input)${NC}"
+    fi
+
+    echo ""
+    echo -e "${GREEN}✅ Secret bootstrap complete!${NC}"
+    echo ""
 }
 
 # ArgoCD helpers
