@@ -1,0 +1,32 @@
+---
+# -- Vault provider configuration
+vault:
+  enabled: false
+  server: "http://vault.vault.svc.cluster.local:8200"
+  path: secret
+  version: v2
+  auth:
+    tokenSecretRef:
+      name: vault-token
+      key: token
+
+# -- Infisical provider configuration
+infisical:
+  enabled: true
+  hostAPI: "http://infisical.infisical.svc.cluster.local:8080/api"
+  auth:
+    universalAuth:
+      credentialsSecretRef:
+        name: infisical-credentials
+        clientId: clientId
+        clientSecret: clientSecret
+
+# -- External Secrets Operator chart values
+external-secrets:
+  installCRDs: true
+  webhook:
+    create: true
+  certController:
+    create: true
+  serviceMonitor:
+    enabled: true
