@@ -14,6 +14,12 @@ vault:
 infisical:
   enabled: true
   hostAPI: "http://infisical.infisical.svc.cluster.local:8080/api"
+  # -- Defines which project/environment/path to fetch secrets from
+  secretsScope:
+    projectSlug: gitops-lab
+    environmentSlug: dev
+    secretsPath: /
+    recursive: true
   auth:
     universalAuth:
       credentialsSecretRef:
