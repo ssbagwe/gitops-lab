@@ -150,7 +150,7 @@ git clone git@github.com:ssbagwe/gitops-lab.git
    Open New Terminal in VS Code.
 
    ```bash
-   lab-up
+   lab-up # or lab-reset after rebuilds
    ```
 
    Open New Terminal in VS Code to check the status of ArgoCD pods
