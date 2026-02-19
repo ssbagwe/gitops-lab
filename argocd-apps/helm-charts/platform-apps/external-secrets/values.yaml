@@ -16,7 +16,7 @@ infisical:
   hostAPI: "http://infisical.infisical.svc.cluster.local:8080/api"
   # -- Defines which project/environment/path to fetch secrets from
   secretsScope:
-    projectSlug: my-project
+    projectSlug: gitops-lab
     environmentSlug: dev
     secretsPath: /
     recursive: true
