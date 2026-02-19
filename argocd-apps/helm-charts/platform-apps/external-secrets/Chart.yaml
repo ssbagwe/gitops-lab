@@ -1,0 +1,10 @@
+---
+apiVersion: v2
+name: external-secrets
+description: Wrapper chart for External Secrets Operator with Vault and Infisical providers
+version: 0.1.0
+type: application
+dependencies:
+  - name: external-secrets
+    version: 0.16.2
+    repository: https://charts.external-secrets.io
