@@ -4,25 +4,37 @@ A self-contained dev container for practicing Kubernetes, ArgoCD, Crossplane, Te
 
 ## Table of Contents
 
-- [Prerequisites](#prerequisites)
-  - [Install Docker](#install-docker)
-  - [Install Technitium DNS](#install-technitium-dns-server-for-private-dns-zone-labinternal)
-  - [Configure DNS Forwarding](#configure-dns-forwarding-to-technitium-for-labinternal)
-  - [Clone the gitops-lab Repository](#clone-the-gitops-lab-repository)
-- [Quick Start](#quick-start)
-- [Included Tools](#included-tools)
-- [Common Commands](#common-commands)
-  - [Git](#git-via-oh-my-zsh-git-plugin)
-  - [Kubernetes](#kubernetes)
-  - [Krew Plugins](#krew-plugins)
-  - [ArgoCD](#argocd)
-  - [LocalStack (AWS)](#localstack-aws)
-  - [Terraform](#terraform)
-  - [Lab Management](#lab-management)
-  - [Watch Resources](#watch-resources)
-- [Practice Scenarios](#practice-scenarios)
-- [Troubleshooting](#troubleshooting)
-- [Resource Usage](#resource-usage)
+- [GitOps Lab](#gitops-lab)
+  - [Table of Contents](#table-of-contents)
+  - [Prerequisites](#prerequisites)
+    - [Install Docker](#install-docker)
+      - [Linux (Ubuntu/Debian)](#linux-ubuntudebian)
+      - [Mac](#mac)
+    - [Install Technitium DNS server for private DNS zone "lab.internal"](#install-technitium-dns-server-for-private-dns-zone-labinternal)
+    - [Configure DNS forwarding to Technitium for `lab.internal`](#configure-dns-forwarding-to-technitium-for-labinternal)
+      - [macOS](#macos)
+      - [Linux (systemd-resolved)](#linux-systemd-resolved)
+      - [Windows](#windows)
+    - [Clone the gitops-lab Repository](#clone-the-gitops-lab-repository)
+  - [Quick Start](#quick-start)
+  - [Included Tools](#included-tools)
+    - [Krew Plugins (pre-installed)](#krew-plugins-pre-installed)
+  - [Common Commands](#common-commands)
+    - [Git (via oh-my-zsh git plugin)](#git-via-oh-my-zsh-git-plugin)
+    - [Kubernetes](#kubernetes)
+    - [Krew Plugins](#krew-plugins)
+    - [ArgoCD](#argocd)
+    - [LocalStack (AWS)](#localstack-aws)
+    - [Terraform](#terraform)
+    - [Lab Management](#lab-management)
+    - [Watch resources](#watch-resources)
+  - [Practice Scenarios](#practice-scenarios)
+    - [1. GitOps with ArgoCD](#1-gitops-with-argocd)
+    - [2. Terraform + LocalStack](#2-terraform--localstack)
+    - [3. Helm Chart Development](#3-helm-chart-development)
+  - [Troubleshooting](#troubleshooting)
+  - [Resource Usage](#resource-usage)
+    - [How to check resource usage](#how-to-check-resource-usage)
 
 ## Prerequisites
 
@@ -74,7 +86,7 @@ Then launch Docker Desktop from Applications and wait for it to start.
 ### Install Technitium DNS server for private DNS zone "lab.internal"
 
 - [Technitium DNS Server - Installation](https://github.com/TechnitiumSoftware/DnsServer?tab=readme-ov-file#installation)
-- Create a `lab.internal` DNS zone with `grafana.lab.internal` and `traefik.lab.internal` records pointing to the Docker host's IP address
+- Create a `lab.internal` DNS zone with `grafana.lab.internal` , `traefik.lab.internal` and `infisical.lab.internal` records pointing to the Docker host's IP address
 
 ### Configure DNS forwarding to Technitium for `lab.internal`
 
@@ -136,67 +148,47 @@ git clone git@github.com:ssbagwe/gitops-lab.git
 2. **Start the lab**
 
    Open New Terminal in VS Code.
+
    ```bash
-   lab-up
+   lab-up # or lab-reset after rebuilds
+   ```
+
+   Open New Terminal in VS Code to check the status of ArgoCD pods
+
+   ```bash
+   k9s -n argocd
    ```
 
    This creates:
    - 3-node kind cluster (1 control plane, 2 workers)
    - ArgoCD for GitOps
+   - CoreDNS patching for `lab.internal` DNS forwarding (prompts for Technitium DNS IP)
+   - Deploys platform & lab ArgoCD applications
    - LocalStack for AWS services
 
-3. **Check status**
+3. **Login to ArgoCD UI**
 
    ```bash
-   lab-status
-   ```
-
-4. **Patch CoreDNS to forward `lab.internal` DNS queries to Technitium DNS**
-
-   > Replace `<IP_ADDRESS>` with your Technitium DNS server IP
-
-   ```bash
-   kubectl patch configmap coredns -n kube-system --type merge -p '{
-     "data": {
-       "Corefile": "lab.internal:53 {\n    errors\n    cache 30\n    forward . <IP_ADDRESS>\n}\n.:53 {\n    errors\n    health {\n       lameduck 5s\n    }\n    ready\n    kubernetes cluster.local in-addr.arpa ip6.arpa {\n       pods insecure\n       fallthrough in-addr.arpa ip6.arpa\n       ttl 30\n    }\n    prometheus :9153\n    forward . /etc/resolv.conf {\n       max_concurrent 1000\n    }\n    cache 30 {\n       disable success cluster.local\n       disable denial cluster.local\n    }\n    loop\n    reload\n    loadbalance\n}\n"
-     }
-   }'
-   ```
-
-5. **Restart CoreDNS to apply the configuration changes**
-
-   ```bash
-   kubectl rollout restart deployment coredns -n kube-system
-   ```
-
-6. **Verify DNS resolution inside the cluster**
-
-   ```bash
-   kubectl run dns-test --rm -it --restart=Never --image=busybox -- nslookup grafana.lab.internal
-   ```
-
-7. **Deploy the platform & lab applications, port forward ArgoCD UI and generate Admin Login creds**
-
-   ```bash
-   kubectl apply -n argocd -f /workspaces/gitops-lab/argocd-apps/deploy/repo-links.yaml
-
    argo-ui
    ```
 
-   <em style="color: green;">Wait for the Applications to deploy and turn green. It will take a while depending on your compute and network.</em>
+   > [!IMPORTANT]
+   > Login to ArgoCD UI and Wait for the Applications to deploy and turn green. It will take a while depending on your compute and network.
+   > Ignore External Secrets and Infisical because it requires additional configuration at `Step 6` below.
 
-8. **Import the Step CA root certificate for browser trust**
+4. **Import the Step CA root certificate for browser trust**
 
    Export the current root CA from the cluster:
 
    ```bash
    kubectl get configmap -n traefik step-ca-step-certificates-certs \
-     -o jsonpath='{.data.root_ca\.crt}' > step-root-ca.crt
+     -o jsonpath='{.data.root_ca\.crt}'
    ```
 
    > **Note:** Each `lab-reset` or devcontainer rebuild generates a new root CA. Remove old ones before importing to avoid stale certificates piling up in your trust store.
 
    **macOS:**
+
    ```bash
    # Remove old step-ca root CAs
    sudo security delete-certificate -c "Step Certificates Root CA" /Library/Keychains/System.keychain
@@ -205,12 +197,14 @@ git clone git@github.com:ssbagwe/gitops-lab.git
    ```
 
    **Linux:**
+
    ```bash
    sudo cp step-root-ca.crt /usr/local/share/ca-certificates/
    sudo update-ca-certificates
    ```
 
    **Windows (PowerShell as Administrator):**
+
    ```powershell
    # Remove old step-ca root CAs
    Get-ChildItem Cert:\LocalMachine\Root | Where-Object { $_.Subject -like "*Step Certificates*" } | Remove-Item
@@ -220,7 +214,7 @@ git clone git@github.com:ssbagwe/gitops-lab.git
 
    **Firefox:** Settings > Privacy & Security > Certificates > View Certificates > Authorities > delete old "Step Certificates Root CA" entries, then Import
 
-9. **Verify the lab services are accessible over HTTPS**
+5. **Verify the lab services are accessible over HTTPS**
 
    Open the following URLs in your browser and confirm no certificate warnings:
    - [https://grafana.lab.internal](https://grafana.lab.internal)
@@ -236,6 +230,11 @@ git clone git@github.com:ssbagwe/gitops-lab.git
    kubectl rollout status deployment traefik -n traefik --timeout=60s
    ```
 
+6. **Bootstrap platform secrets interactively**
+
+   ```bash
+   lab-secrets
+   ```
 
 ## Included Tools
 
@@ -346,6 +345,8 @@ lab-up                 # Start everything
 lab-down               # Tear down
 lab-reset              # Full reset
 lab-status             # Check status
+lab-secrets            # Bootstrap platform secrets interactively
+patch-coredns          # Patch CoreDNS for lab.internal DNS forwarding
 ```
 
 ### Watch resources
