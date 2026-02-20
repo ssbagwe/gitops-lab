@@ -17,8 +17,6 @@ helm repo add stable https://charts.helm.sh/stable 2>/dev/null || true
 helm repo add argo https://argoproj.github.io/argo-helm 2>/dev/null || true
 helm repo update
 
-echo "✅ Post-create setup complete!"
-
 # Install useful krew plugins
 echo "📦 Installing krew plugins..."
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
