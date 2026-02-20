@@ -172,7 +172,7 @@ git clone git@github.com:ssbagwe/gitops-lab.git
    argo-ui
    ```
 
-   > [!IMPORTANT]
+   > :warn:
    > Login to ArgoCD UI and Wait for the Applications to deploy and turn green. It will take a while depending on your compute and network.
    > Ignore External Secrets and Infisical because it requires additional configuration at `Step 6` below.
 

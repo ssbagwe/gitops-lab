@@ -1,0 +1,51 @@
+---
+# -- AWS ProviderConfig
+providerConfig:
+  aws:
+    enabled: true
+    name: default
+    # -- Credentials source: Secret or IRSA
+    credentials:
+      source: Secret
+      secretRef:
+        name: aws-credentials
+        namespace: crossplane-system
+        key: credentials
+
+# -- Crossplane chart values (passed to the dependency)
+crossplane:
+  replicas: 1
+
+  metrics:
+    enabled: true
+
+  webhooks:
+    enabled: true
+
+  # -- Install providers via chart's native package management
+  provider:
+    packages:
+      - xpkg.upbound.io/upbound/provider-aws-s3:v2.4.0
+      - xpkg.upbound.io/upbound/provider-aws-iam:v2.4.0
+      - xpkg.upbound.io/upbound/provider-aws-ec2:v2.4.0
+
+  # -- Resource limits for lab environment
+  resourcesCrossplane:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+
+  resourcesRBACManager:
+    limits:
+      cpu: 100m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+
+  # -- Increase cache for provider packages
+  packageCache:
+    sizeLimit: 256Mi

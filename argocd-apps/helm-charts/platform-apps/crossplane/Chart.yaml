@@ -1,0 +1,10 @@
+---
+apiVersion: v2
+name: crossplane
+description: Wrapper chart for Crossplane with Upbound AWS S3 provider
+version: 0.1.0
+type: application
+dependencies:
+  - name: crossplane
+    version: 2.2.0
+    repository: https://charts.crossplane.io/stable
