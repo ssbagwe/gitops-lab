@@ -4,6 +4,8 @@ kind: Application
 metadata:
   name: k8sgpt-operator
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
 spec:
   ignoreDifferences:
     - group: ""
