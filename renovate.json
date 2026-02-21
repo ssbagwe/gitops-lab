@@ -7,12 +7,18 @@
   "automergeType": "pr",
   "platformAutomerge": true,
   "argocd": {
-    "fileMatch": ["argocd-apps/.+\\.yaml$"]
+    "managerFilePatterns": [
+      "/argocd-apps/.+\\.yaml$/"
+    ]
   },
   "kubernetes": {
-    "fileMatch": ["k8s-manifests/.+\\.yaml$"]
+    "managerFilePatterns": [
+      "/k8s-manifests/.+\\.yaml$/"
+    ]
   },
   "terraform": {
-    "fileMatch": ["terraform/.+\\.tf$"]
+    "managerFilePatterns": [
+      "/terraform/.+\\.tf$/"
+    ]
   }
 }
