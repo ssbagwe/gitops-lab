@@ -4,6 +4,8 @@ apiVersion: aws.upbound.io/v1beta1
 kind: ProviderConfig
 metadata:
   name: {{ .Values.providerConfig.aws.name }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
 spec:
   credentials:
     source: {{ .Values.providerConfig.aws.credentials.source }}
