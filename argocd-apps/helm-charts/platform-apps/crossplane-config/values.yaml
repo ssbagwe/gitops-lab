@@ -1,0 +1,12 @@
+# -- AWS ProviderConfig
+providerConfig:
+  aws:
+    enabled: true
+    name: default
+    # -- Credentials source: Secret or IRSA
+    credentials:
+      source: Secret
+      secretRef:
+        name: aws-credentials
+        namespace: crossplane-system
+        key: credentials

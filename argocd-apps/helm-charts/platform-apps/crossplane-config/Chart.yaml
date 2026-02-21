@@ -1,0 +1,6 @@
+---
+apiVersion: v2
+name: crossplane-config
+description: Crossplane AWS ProviderConfig and credentials — deployed after crossplane-core providers are healthy
+version: 0.1.0
+type: application
