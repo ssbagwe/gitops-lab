@@ -4,6 +4,8 @@ kind: Application
 metadata:
   name: reflector
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
 spec:
   project: platform-apps
   source:
