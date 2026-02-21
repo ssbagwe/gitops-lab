@@ -82,10 +82,12 @@ lab-up() {
         kubectl create namespace argocd
         kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml --server-side
         echo -e "${YELLOW}⏳ Waiting for ArgoCD...${NC}"
-        kubectl wait --namespace argocd \
-            --for=condition=ready pod \
-            --selector=app.kubernetes.io/name=argocd-server \
-            --timeout=180s 2>/dev/null || true
+        for component in argocd-server argocd-repo-server argocd-application-controller; do
+            kubectl wait --namespace argocd \
+                --for=condition=ready pod \
+                --selector=app.kubernetes.io/name=${component} \
+                --timeout=180s 2>/dev/null || true
+        done
 
         echo -e "${YELLOW}🔧 Configuring ArgoCD...${NC}"
         # Enable exec feature
