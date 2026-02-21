@@ -2,16 +2,23 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: crossplane
+  name: crossplane-config
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-wave: "3"
 spec:
+  ignoreDifferences:
+    - group: ""
+      kind: Secret
+      name: aws-credentials
+      jsonPointers:
+        - /data
+        - /stringData
   project: platform-apps
   source:
     repoURL: https://github.com/ssbagwe/gitops-lab
     targetRevision: main
-    path: argocd-apps/helm-charts/platform-apps/crossplane
+    path: argocd-apps/helm-charts/platform-apps/crossplane-config
   destination:
     server: https://kubernetes.default.svc
     namespace: crossplane-system
@@ -22,3 +29,9 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 30s
+        factor: 2
+        maxDuration: 5m
