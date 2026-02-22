@@ -1,0 +1,121 @@
+{{- /*
+PostSync readiness hook for kube-prometheus-stack.
+
+Waits for all core components (operator, grafana, kube-state-metrics,
+prometheus, alertmanager) to fully roll out before ArgoCD marks the
+application Healthy. This ensures sync-wave ordering works correctly
+when downstream apps (loki, promtail, etc.) depend on the stack being
+fully operational.
+
+Image: registry.k8s.io/kubectl — official Kubernetes project image, no
+third-party dependencies.
+*/ -}}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kube-prometheus-stack-readiness-hook
+  namespace: monitoring
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: kube-prometheus-stack-readiness-hook
+  namespace: monitoring
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments", "statefulsets", "replicasets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: kube-prometheus-stack-readiness-hook
+  namespace: monitoring
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+subjects:
+  - kind: ServiceAccount
+    name: kube-prometheus-stack-readiness-hook
+    namespace: monitoring
+roleRef:
+  kind: Role
+  name: kube-prometheus-stack-readiness-hook
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kube-prometheus-stack-readiness-hook
+  namespace: monitoring
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  ttlSecondsAfterFinished: 300
+  backoffLimit: 2
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: kube-prometheus-stack-readiness-hook
+        app.kubernetes.io/component: readiness-hook
+    spec:
+      serviceAccountName: kube-prometheus-stack-readiness-hook
+      restartPolicy: OnFailure
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: wait
+          image: registry.k8s.io/kubectl:v1.32.3
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+              echo "Waiting for prometheus-operator deployment..."
+              kubectl rollout status deployment/kube-prometheus-stack-operator \
+                -n monitoring --timeout=10m
+
+              echo "Waiting for grafana deployment..."
+              kubectl rollout status deployment/kube-prometheus-stack-grafana \
+                -n monitoring --timeout=10m
+
+              echo "Waiting for kube-state-metrics deployment..."
+              kubectl rollout status deployment/kube-prometheus-stack-kube-state-metrics \
+                -n monitoring --timeout=10m
+
+              echo "Waiting for prometheus statefulset..."
+              kubectl rollout status statefulset/prometheus-kube-prometheus-stack-prometheus \
+                -n monitoring --timeout=10m
+
+              echo "Waiting for alertmanager statefulset..."
+              kubectl rollout status statefulset/alertmanager-kube-prometheus-stack-alertmanager \
+                -n monitoring --timeout=10m
+
+              echo "All kube-prometheus-stack components are ready."
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
