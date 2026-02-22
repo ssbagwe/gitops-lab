@@ -94,7 +94,7 @@ spec:
           command:
             - /bin/sh
             - -c
-            - |\
+            - |
               set -e
               echo "Waiting for prometheus-operator deployment..."
               kubectl rollout status deployment/{{ .Release.Name }}-operator \
