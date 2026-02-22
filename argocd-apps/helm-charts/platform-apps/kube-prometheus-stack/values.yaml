@@ -29,3 +29,12 @@ kube-prometheus-stack:
         serve_from_sub_path: true
   alertmanager:
     enabled: true
+
+kubePrometheusStackReadinessHook:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 64Mi
