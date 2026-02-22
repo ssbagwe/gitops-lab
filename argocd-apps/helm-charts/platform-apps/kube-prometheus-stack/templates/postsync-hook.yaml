@@ -60,7 +60,7 @@ subjects:
 roleRef:
   kind: Role
   name: {{ $fullName }}-readiness-hook
-  apiGroup: rbac.authorization.io
+  apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: batch/v1
 kind: Job
@@ -97,23 +97,23 @@ spec:
             - |\
               set -e
               echo "Waiting for prometheus-operator deployment..."
-              kubectl rollout status deployment/{{ .Release.Name }}-operator \\
+              kubectl rollout status deployment/{{ .Release.Name }}-operator \
                 -n {{ .Release.Namespace }} --timeout=10m
 
               echo "Waiting for grafana deployment..."
-              kubectl rollout status deployment/{{ .Release.Name }}-grafana \\
+              kubectl rollout status deployment/{{ .Release.Name }}-grafana \
                 -n {{ .Release.Namespace }} --timeout=10m
 
               echo "Waiting for kube-state-metrics deployment..."
-              kubectl rollout status deployment/{{ .Release.Name }}-kube-state-metrics \\
+              kubectl rollout status deployment/{{ .Release.Name }}-kube-state-metrics \
                 -n {{ .Release.Namespace }} --timeout=10m
 
               echo "Waiting for prometheus statefulset..."
-              kubectl rollout status statefulset/prometheus-{{ .Release.Name }}-prometheus \\
+              kubectl rollout status statefulset/prometheus-{{ .Release.Name }}-prometheus \
                 -n {{ .Release.Namespace }} --timeout=10m
 
               echo "Waiting for alertmanager statefulset..."
-              kubectl rollout status statefulset/alertmanager-{{ .Release.Name }}-alertmanager \\
+              kubectl rollout status statefulset/alertmanager-{{ .Release.Name }}-alertmanager \
                 -n {{ .Release.Namespace }} --timeout=10m
 
               echo "All kube-prometheus-stack components are ready."
