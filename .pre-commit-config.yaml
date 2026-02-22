@@ -18,6 +18,15 @@ repos:
         args: [--fix=lf]
       - id: no-commit-to-branch
       - id: trailing-whitespace
+
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.38.0
+    hooks:
+      - id: yamllint
+        args: [--config-file=.yamllint.yaml]
+        files: \.(yml|yaml)$
+        default_stages: [pre-commit]
+
   - repo: local
     hooks:
       - id: sync-versions
