@@ -1,130 +1,130 @@
-{{- /*
-PostSync readiness hook for kube-prometheus-stack.
+# {{- /*
+# PostSync readiness hook for kube-prometheus-stack.
 
-Waits for all core components (operator, grafana, kube-state-metrics,
-prometheus, alertmanager) to fully roll out before ArgoCD marks the
-application Healthy. This ensures sync-wave ordering works correctly
-when downstream apps (loki, promtail, etc.) depend on the stack being
-fully operational.
+# Waits for all core components (operator, grafana, kube-state-metrics,
+# prometheus, alertmanager) to fully roll out before ArgoCD marks the
+# application Healthy. This ensures sync-wave ordering works correctly
+# when downstream apps (loki, promtail, etc.) depend on the stack being
+# fully operational.
 
-Image: registry.k8s.io/kubectl — official Kubernetes project image, no
-third-party dependencies.
-*/ -}}
----
-{{- $fullName := include "kube-prometheus-stack.fullname" . -}}
-{{- $labels := include "kube-prometheus-stack.labels" . -}}
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: {{ $fullName }}-readiness-hook
-  namespace: {{ .Release.Namespace }}
-  annotations:
-    argocd.argoproj.io/hook: PostSync
-    argocd.argoproj.io/hook-delete-policy: HookSucceeded
-  labels:
-    {{- $labels | nindent 4 }}
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: {{ $fullName }}-readiness-hook
-  namespace: {{ .Release.Namespace }}
-  annotations:
-    argocd.argoproj.io/hook: PostSync
-    argocd.argoproj.io/hook-delete-policy: HookSucceeded
-  labels:
-    {{- $labels | nindent 4 }}
-rules:
-  - apiGroups: ["apps"]
-    resources: ["deployments", "statefulsets", "replicasets"]
-    verbs: ["get", "list", "watch"]
-  - apiGroups: [""]
-    resources: ["pods"]
-    verbs: ["get", "list", "watch"]
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: {{ $fullName }}-readiness-hook
-  namespace: {{ .Release.Namespace }}
-  annotations:
-    argocd.argoproj.io/hook: PostSync
-    argocd.argoproj.io/hook-delete-policy: HookSucceeded
-  labels:
-    {{- $labels | nindent 4 }}
-subjects:
-  - kind: ServiceAccount
-    name: {{ $fullName }}-readiness-hook
-    namespace: {{ .Release.Namespace }}
-roleRef:
-  kind: Role
-  name: {{ $fullName }}-readiness-hook
-  apiGroup: rbac.authorization.k8s.io
----
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: {{ $fullName }}-readiness-hook
-  namespace: {{ .Release.Namespace }}
-  annotations:
-    argocd.argoproj.io/hook: PostSync
-    argocd.argoproj.io/hook-delete-policy: HookSucceeded
-  labels:
-    {{- $labels | nindent 4 }}
-spec:
-  ttlSecondsAfterFinished: 300
-  backoffLimit: 2
-  template:
-    metadata:
-      labels:
-        {{- $labels | nindent 8 }}
-        app.kubernetes.io/component: readiness-hook
-    spec:
-      serviceAccountName: {{ $fullName }}-readiness-hook
-      restartPolicy: OnFailure
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 65534
-        seccompProfile:
-          type: RuntimeDefault
-      containers:
-        - name: wait
-          image: registry.k8s.io/kubectl:v1.32.3
-          command:
-            - /bin/sh
-            - -c
-            - |
-              set -e
-              echo "Waiting for prometheus-operator deployment..."
-              kubectl rollout status deployment/{{ .Release.Name }}-operator \
-                -n {{ .Release.Namespace }} --timeout=10m
+# Image: registry.k8s.io/kubectl — official Kubernetes project image, no
+# third-party dependencies.
+# */ -}}
+# ---
+# {{- $fullName := include "kube-prometheus-stack.fullname" . -}}
+# {{- $labels := include "kube-prometheus-stack.labels" . -}}
+# ---
+# apiVersion: v1
+# kind: ServiceAccount
+# metadata:
+#   name: {{ $fullName }}-readiness-hook
+#   namespace: {{ .Release.Namespace }}
+#   annotations:
+#     argocd.argoproj.io/hook: PostSync
+#     argocd.argoproj.io/hook-delete-policy: HookSucceeded
+#   labels:
+#     {{- $labels | nindent 4 }}
+# ---
+# apiVersion: rbac.authorization.k8s.io/v1
+# kind: Role
+# metadata:
+#   name: {{ $fullName }}-readiness-hook
+#   namespace: {{ .Release.Namespace }}
+#   annotations:
+#     argocd.argoproj.io/hook: PostSync
+#     argocd.argoproj.io/hook-delete-policy: HookSucceeded
+#   labels:
+#     {{- $labels | nindent 4 }}
+# rules:
+#   - apiGroups: ["apps"]
+#     resources: ["deployments", "statefulsets", "replicasets"]
+#     verbs: ["get", "list", "watch"]
+#   - apiGroups: [""]
+#     resources: ["pods"]
+#     verbs: ["get", "list", "watch"]
+# ---
+# apiVersion: rbac.authorization.k8s.io/v1
+# kind: RoleBinding
+# metadata:
+#   name: {{ $fullName }}-readiness-hook
+#   namespace: {{ .Release.Namespace }}
+#   annotations:
+#     argocd.argoproj.io/hook: PostSync
+#     argocd.argoproj.io/hook-delete-policy: HookSucceeded
+#   labels:
+#     {{- $labels | nindent 4 }}
+# subjects:
+#   - kind: ServiceAccount
+#     name: {{ $fullName }}-readiness-hook
+#     namespace: {{ .Release.Namespace }}
+# roleRef:
+#   kind: Role
+#   name: {{ $fullName }}-readiness-hook
+#   apiGroup: rbac.authorization.k8s.io
+# ---
+# apiVersion: batch/v1
+# kind: Job
+# metadata:
+#   name: {{ $fullName }}-readiness-hook
+#   namespace: {{ .Release.Namespace }}
+#   annotations:
+#     argocd.argoproj.io/hook: PostSync
+#     argocd.argoproj.io/hook-delete-policy: HookSucceeded
+#   labels:
+#     {{- $labels | nindent 4 }}
+# spec:
+#   ttlSecondsAfterFinished: 300
+#   backoffLimit: 2
+#   template:
+#     metadata:
+#       labels:
+#         {{- $labels | nindent 8 }}
+#         app.kubernetes.io/component: readiness-hook
+#     spec:
+#       serviceAccountName: {{ $fullName }}-readiness-hook
+#       restartPolicy: OnFailure
+#       securityContext:
+#         runAsNonRoot: true
+#         runAsUser: 65534
+#         seccompProfile:
+#           type: RuntimeDefault
+#       containers:
+#         - name: wait
+#           image: registry.k8s.io/kubectl:v1.32.3
+#           command:
+#             - /bin/sh
+#             - -c
+#             - |
+#               set -e
+#               echo "Waiting for prometheus-operator deployment..."
+#               kubectl rollout status deployment/{{ .Release.Name }}-operator \
+#                 -n {{ .Release.Namespace }} --timeout=10m
 
-              echo "Waiting for grafana deployment..."
-              kubectl rollout status deployment/{{ .Release.Name }}-grafana \
-                -n {{ .Release.Namespace }} --timeout=10m
+#               echo "Waiting for grafana deployment..."
+#               kubectl rollout status deployment/{{ .Release.Name }}-grafana \
+#                 -n {{ .Release.Namespace }} --timeout=10m
 
-              echo "Waiting for kube-state-metrics deployment..."
-              kubectl rollout status deployment/{{ .Release.Name }}-kube-state-metrics \
-                -n {{ .Release.Namespace }} --timeout=10m
+#               echo "Waiting for kube-state-metrics deployment..."
+#               kubectl rollout status deployment/{{ .Release.Name }}-kube-state-metrics \
+#                 -n {{ .Release.Namespace }} --timeout=10m
 
-              echo "Waiting for prometheus statefulset..."
-              kubectl rollout status statefulset/prometheus-{{ .Release.Name }}-prometheus \
-                -n {{ .Release.Namespace }} --timeout=10m
+#               echo "Waiting for prometheus statefulset..."
+#               kubectl rollout status statefulset/prometheus-{{ .Release.Name }}-prometheus \
+#                 -n {{ .Release.Namespace }} --timeout=10m
 
-              echo "Waiting for alertmanager statefulset..."
-              kubectl rollout status statefulset/alertmanager-{{ .Release.Name }}-alertmanager \
-                -n {{ .Release.Namespace }} --timeout=10m
+#               echo "Waiting for alertmanager statefulset..."
+#               kubectl rollout status statefulset/alertmanager-{{ .Release.Name }}-alertmanager \
+#                 -n {{ .Release.Namespace }} --timeout=10m
 
-              echo "All kube-prometheus-stack components are ready."
-          resources:
-            requests:
-              {{- toYaml .Values.kubePrometheusStackReadinessHook.resources.requests | nindent 14 }}
-            limits:
-              {{- toYaml .Values.kubePrometheusStackReadinessHook.resources.limits | nindent 14 }}
-          securityContext:
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
-            capabilities:
-              drop:
-                - ALL
+#               echo "All kube-prometheus-stack components are ready."
+#           resources:
+#             requests:
+#               {{- toYaml .Values.kubePrometheusStackReadinessHook.resources.requests | nindent 14 }}
+#             limits:
+#               {{- toYaml .Values.kubePrometheusStackReadinessHook.resources.limits | nindent 14 }}
+#           securityContext:
+#             allowPrivilegeEscalation: false
+#             readOnlyRootFilesystem: true
+#             capabilities:
+#               drop:
+#                 - ALL
