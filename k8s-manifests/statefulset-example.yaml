@@ -15,7 +15,7 @@ spec:
   ports:
     - port: 5432
       name: postgres
-  clusterIP: None  # Headless service for StatefulSet
+  clusterIP: None # Headless service for StatefulSet
   selector:
     app: postgres
 ---
@@ -35,9 +35,15 @@ spec:
       labels:
         app: postgres
     spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 3000
+        fsGroup: 2000
       containers:
         - name: postgres
           image: postgres:18-alpine
+          securityContext:
+            readOnlyRootFilesystem: true
           ports:
             - containerPort: 5432
               name: postgres
