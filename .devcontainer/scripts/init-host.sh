@@ -11,9 +11,15 @@ if [ -z "$USER_HOME" ]; then
   exit 1
 fi
 
+echo "==> Initializing host directories under $USER_HOME"
 mkdir -p "$USER_HOME/.kube" \
          "$USER_HOME/.aws" \
          "$USER_HOME/Documents/Projects"
 
 # Create zsh history file if it doesn't exist
-[ -f "$USER_HOME/.zsh_history_devcontainers" ] || touch "$USER_HOME/.zsh_history_devcontainers"
+if [ ! -f "$USER_HOME/.zsh_history_devcontainers" ]; then
+  echo "==> Creating .zsh_history_devcontainers"
+  touch "$USER_HOME/.zsh_history_devcontainers"
+fi
+
+echo "==> Host initialization complete"

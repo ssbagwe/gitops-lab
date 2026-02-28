@@ -36,7 +36,7 @@
   /* ===============================
      Initialize Folders on Host
      =============================== */
-  "initializeCommand": "bash .devcontainer/scripts/init-host.sh",
+  "initializeCommand": ["bash", ".devcontainer/scripts/init-host.sh"],
   /* ===============================
      Mounts (GitOps-friendly)
      =============================== */
