@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -eo pipefail
 
 # sync-versions.sh - Dynamically sync tool versions from Dockerfile to README.md
 # Reads all ARG *_VERSION variables and updates the README table
@@ -83,18 +83,23 @@ for tool in "${sorted_tools[@]}"; do
     table_lines+=("| $tool | $version | $description |")
 done
 
-# Create temp file
+# Create temp files
 TMP_FILE=$(mktemp)
-trap 'rm -f "$TMP_FILE"' EXIT
+TABLE_FILE=$(mktemp)
+trap 'rm -f "$TMP_FILE" "$TABLE_FILE"' EXIT
+
+# Write table to a file (avoids macOS awk multi-line -v limitation)
+printf '%s\n' "${table_lines[@]}" > "$TABLE_FILE"
 
 # Replace the table in README
-awk -v table="$(printf '%s\n' "${table_lines[@]}")" '
+awk -v table_file="$TABLE_FILE" '
     BEGIN { in_table = 0; table_printed = 0 }
 
     # Detect start of table
     /^\| Tool \| Version \| Purpose \|$/ {
         if (!table_printed) {
-            print table
+            while ((getline line < table_file) > 0) print line
+            close(table_file)
             table_printed = 1
             in_table = 1
         }
