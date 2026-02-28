@@ -10,11 +10,13 @@ A self-contained dev container for practicing Kubernetes, ArgoCD, Crossplane, Te
     - [Install Docker](#install-docker)
       - [Linux (Ubuntu/Debian)](#linux-ubuntudebian)
       - [Mac](#mac)
+      - [Windows](#windows)
+    - [Install VS Code and Dev Containers Extension](#install-vs-code-and-dev-containers-extension)
     - [Install Technitium DNS server for private DNS zone "lab.internal"](#install-technitium-dns-server-for-private-dns-zone-labinternal)
     - [Configure DNS forwarding to Technitium for `lab.internal`](#configure-dns-forwarding-to-technitium-for-labinternal)
       - [macOS](#macos)
       - [Linux (systemd-resolved)](#linux-systemd-resolved)
-      - [Windows](#windows)
+      - [Windows (PowerShell)](#windows-powershell)
     - [Clone the gitops-lab Repository](#clone-the-gitops-lab-repository)
   - [Quick Start](#quick-start)
   - [Included Tools](#included-tools)
@@ -83,6 +85,56 @@ brew install --cask docker
 
 Then launch Docker Desktop from Applications and wait for it to start.
 
+#### Windows
+
+1. **Install WSL2** (if not already installed) — open PowerShell as Administrator:
+
+   ```powershell
+   wsl --install
+   ```
+
+   Restart your machine when prompted, then verify:
+
+   ```powershell
+   wsl --status
+   ```
+
+   Ensure the default version is WSL 2. If not:
+
+   ```powershell
+   wsl --set-default-version 2
+   ```
+
+2. **Install Docker Desktop** — download from [Docker Desktop for Windows](https://docs.docker.com/desktop/setup/install/windows-install/) or use `winget`:
+
+   ```powershell
+   winget install Docker.DockerDesktop
+   ```
+
+   During setup, ensure **"Use WSL 2 based engine"** is checked (Settings > General).
+
+3. **Install Git for Windows** (provides `bash` needed by the devcontainer init script):
+
+   ```powershell
+   winget install Git.Git
+   ```
+
+### Install VS Code and Dev Containers Extension
+
+1. Install [Visual Studio Code](https://code.visualstudio.com/) if not already installed.
+
+2. Install the **Dev Containers** extension:
+   - Open VS Code
+   - Press `Ctrl+Shift+X` (or `Cmd+Shift+X` on Mac) to open Extensions
+   - Search for **Dev Containers** (by Microsoft)
+   - Click **Install**
+
+   Or install from the command line:
+
+   ```bash
+   code --install-extension ms-vscode-remote.remote-containers
+   ```
+
 ### Install Technitium DNS server for private DNS zone "lab.internal"
 
 - [Technitium DNS Server - Installation](https://github.com/TechnitiumSoftware/DnsServer?tab=readme-ov-file#installation)
@@ -115,7 +167,7 @@ sudo systemctl restart systemd-resolved
 
 Verify with: `resolvectl query grafana.lab.internal`
 
-#### Windows
+#### Windows (PowerShell)
 
 Use PowerShell (as Administrator):
 

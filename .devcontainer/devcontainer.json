@@ -36,14 +36,15 @@
   /* ===============================
      Initialize Folders on Host
      =============================== */
-  "initializeCommand": "mkdir -p ~/.kube ~/.aws && touch ~/.zsh_history_devcontainers",
+  "initializeCommand": "bash .devcontainer/scripts/init-host.sh",
   /* ===============================
      Mounts (GitOps-friendly)
      =============================== */
   "mounts": [
-    "source=${env:HOME}/.kube,target=/home/ubuntu/.kube,type=bind,consistency=cached",
-    "source=${env:HOME}/.aws,target=/home/ubuntu/.aws,type=bind,consistency=cached",
-    "source=${env:HOME}/.zsh_history_devcontainers,target=/home/ubuntu/.zsh_history,type=bind"
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.kube,target=/home/ubuntu/.kube,type=bind,consistency=cached",
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.aws,target=/home/ubuntu/.aws,type=bind,consistency=cached",
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.zsh_history_devcontainers,target=/home/ubuntu/.zsh_history,type=bind",
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/Documents/Projects,target=/workspaces/Projects,type=bind,consistency=cached"
   ],
   /* ===============================
      Features
