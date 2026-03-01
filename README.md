@@ -77,13 +77,27 @@ sudo usermod -aG docker $USER
 
 #### Mac
 
-Install [Docker Desktop for Mac](https://docs.docker.com/desktop/setup/install/mac-install/) or use Homebrew:
+Install [Colima](https://github.com/abiosoft/colima) as the container runtime and the Docker CLI tools via Homebrew:
 
 ```bash
-brew install --cask docker
+brew install colima docker docker-compose docker-buildx docker-credential-helper
+
+# Link buildx into Docker CLI plugins
+mkdir -p ~/.docker/cli-plugins
+ln -sfn $(brew --prefix)/opt/docker-buildx/bin/docker-buildx ~/.docker/cli-plugins/docker-buildx
 ```
 
-Then launch Docker Desktop from Applications and wait for it to start.
+Start Colima with recommended resources:
+
+```bash
+colima start --cpu 4 --memory 16 --disk 100
+```
+
+Colima starts automatically on boot by default. To verify it's running:
+
+```bash
+colima status
+```
 
 #### Windows
 
@@ -453,7 +467,7 @@ helm install my-app ./my-app
 **Docker not starting?**
 
 - **Linux**: Ensure Docker service is running (`sudo systemctl start docker`) and your user is in the docker group (`sudo usermod -aG docker $USER`, then log out and back in)
-- **Mac**: Make sure Docker Desktop or OrbStack is running
+- **Mac**: Make sure Colima is running (`colima status`; start with `colima start`)
 - **Windows**: Make sure Docker Desktop is running and WSL2 is enabled
 
 **Kind cluster won't create?**
