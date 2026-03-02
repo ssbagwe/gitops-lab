@@ -125,6 +125,10 @@ colima status
    winget install -e --id RedHat.Podman-Desktop
    ```
 
+   After installation, enable Docker compatibility so VS Code Dev Containers can connect:
+   - Open Podman Desktop → **Settings** → **Preferences** → enable **Docker Compatibility**
+   - Alternatively, from a terminal: `podman machine init` then `podman machine start`
+
 3. **Install Git for Windows** (provides `bash` needed by the devcontainer init script):
 
    ```powershell
