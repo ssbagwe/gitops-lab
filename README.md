@@ -119,9 +119,11 @@ colima status
    wsl --set-default-version 2
    ```
 
-2. **Install Container Desktop** — download the latest installer from [Container Desktop releases](https://github.com/container-desktop/container-desktop/releases) and run `ContainerDesktopInstaller.exe`.
+2. **Install Podman Desktop** — download from [Podman Desktop for Windows](https://podman-desktop.io/downloads/windows) or use `winget`:
 
-   > If Windows Defender SmartScreen blocks the installer, select **"More Info"** then **"Run Anyway"**.
+   ```powershell
+   winget install -e --id RedHat.Podman-Desktop
+   ```
 
 3. **Install Git for Windows** (provides `bash` needed by the devcontainer init script):
 
@@ -464,7 +466,7 @@ helm install my-app ./my-app
 
 - **Linux**: Ensure Docker service is running (`sudo systemctl start docker`) and your user is in the docker group (`sudo usermod -aG docker $USER`, then log out and back in)
 - **Mac**: Make sure Colima is running (`colima status`; start with `colima start`)
-- **Windows**: Make sure Container Desktop is running and WSL2 is enabled
+- **Windows**: Make sure Podman Desktop is running and WSL2 is enabled
 
 **Kind cluster won't create?**
 
