@@ -119,13 +119,15 @@ colima status
    wsl --set-default-version 2
    ```
 
-2. **Install Docker Desktop** — download from [Docker Desktop for Windows](https://docs.docker.com/desktop/setup/install/windows-install/) or use `winget`:
+2. **Install Podman Desktop** — download from [Podman Desktop for Windows](https://podman-desktop.io/downloads/windows) or use `winget`:
 
    ```powershell
-   winget install Docker.DockerDesktop
+   winget install -e --id RedHat.Podman-Desktop
    ```
 
-   During setup, ensure **"Use WSL 2 based engine"** is checked (Settings > General).
+   After installation, enable Docker compatibility so VS Code Dev Containers can connect:
+   - Open Podman Desktop → **Settings** → **Preferences** → enable **Docker Compatibility**
+   - Alternatively, from a terminal: `podman machine init` then `podman machine start`
 
 3. **Install Git for Windows** (provides `bash` needed by the devcontainer init script):
 
@@ -468,7 +470,7 @@ helm install my-app ./my-app
 
 - **Linux**: Ensure Docker service is running (`sudo systemctl start docker`) and your user is in the docker group (`sudo usermod -aG docker $USER`, then log out and back in)
 - **Mac**: Make sure Colima is running (`colima status`; start with `colima start`)
-- **Windows**: Make sure Docker Desktop is running and WSL2 is enabled
+- **Windows**: Make sure Podman Desktop is running and WSL2 is enabled
 
 **Kind cluster won't create?**
 
