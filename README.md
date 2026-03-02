@@ -119,7 +119,14 @@ colima status
    wsl --set-default-version 2
    ```
 
-2. **Install Podman Desktop** — download from [Podman Desktop for Windows](https://podman-desktop.io/downloads/windows) or use `winget`:
+2. **Install Docker CLI and Buildx** — required for VS Code Dev Containers to build and communicate with Podman Desktop:
+
+   ```powershell
+   winget install -e --id Docker.DockerCLI
+   winget install -e --id Docker.BuildX
+   ```
+
+3. **Install Podman Desktop** — download from [Podman Desktop for Windows](https://podman-desktop.io/downloads/windows) or use `winget`:
 
    ```powershell
    winget install -e --id RedHat.Podman-Desktop
@@ -129,7 +136,7 @@ colima status
    - Open Podman Desktop → **Settings** → **Preferences** → enable **Docker Compatibility**
    - Alternatively, from a terminal: `podman machine init` then `podman machine start`
 
-3. **Install Git for Windows** (provides `bash` needed by the devcontainer init script):
+4. **Install Git for Windows** (provides `bash` needed by the devcontainer init script):
 
    ```powershell
    winget install Git.Git
