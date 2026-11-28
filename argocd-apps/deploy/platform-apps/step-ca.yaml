@@ -10,7 +10,7 @@ spec:
   project: platform-apps
   source:
     repoURL: https://smallstep.github.io/helm-charts/
-    targetRevision: 1.29.0
+    targetRevision: 1.30.1
     chart: step-certificates
     helm:
       values: |
